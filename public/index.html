@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MiniFlex Collector</title>
+    <meta
+      name="description"
+      content="Sistema de colecionadores MiniFlex com catalogos, rankings, conquistas e administracao."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#home" data-view-link="home" aria-label="MiniFlex Collector">
+        <span class="brand-mark">MF</span>
+        <span>MiniFlex</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Navegacao principal">
+        <button class="nav-link is-active" data-view-link="home">Inicio</button>
+        <button class="nav-link" data-view-link="collection">Colecao</button>
+        <button class="nav-link" data-view-link="ranking">Ranking</button>
+        <button class="nav-link" data-view-link="hall">Hall</button>
+        <button class="nav-link" data-view-link="store">Loja</button>
+        <button class="nav-link" data-view-link="dashboard">Minha area</button>
+        <button class="nav-link nav-admin" data-view-link="admin">Admin</button>
+        <button class="nav-link nav-logout hidden" data-logout type="button">Sair</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="view is-visible" id="view-home">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Temporada 1</p>
+            <h1>MiniFlex</h1>
+            <p class="tagline">Colecione. Troque. Complete.</p>
+            <div class="hero-actions">
+              <button class="button primary" data-view-link="dashboard">Entrar ou criar conta</button>
+              <button class="button ghost" data-view-link="collection">Ver animais</button>
+            </div>
+          </div>
+          <div class="hero-object" aria-hidden="true">
+            <span class="cube cube-a"></span>
+            <span class="cube cube-b"></span>
+            <span class="cube cube-c"></span>
+          </div>
+        </div>
+
+        <section class="metric-grid" id="homeMetrics" aria-label="Resumo MiniFlex"></section>
+
+        <section class="spotlight-grid">
+          <article class="spotlight">
+            <span class="spotlight-icon">🏆</span>
+            <p>Primeiro a completar</p>
+            <strong id="firstCompleter">Ainda ninguem</strong>
+          </article>
+          <article class="spotlight">
+            <span class="spotlight-icon">🥇</span>
+            <p>Maior comprador</p>
+            <strong id="topBuyer">Ainda ninguem</strong>
+          </article>
+        </section>
+      </section>
+
+      <section class="view" id="view-dashboard">
+        <div class="section-heading">
+          <p class="eyebrow">Area do colecionador</p>
+          <h2>Conta e progresso</h2>
+        </div>
+
+        <div class="auth-grid" id="authPanel">
+          <form class="panel form-stack" id="registerForm">
+            <h3>Criar conta</h3>
+            <label>Nome <input name="nome" autocomplete="name" required /></label>
+            <label>Senha <input name="senha" type="password" minlength="4" required /></label>
+            <button class="button primary" type="submit">Cadastrar</button>
+          </form>
+
+          <form class="panel form-stack" id="loginForm">
+            <h3>Entrar</h3>
+            <label>Nome <input name="nome" autocomplete="name" required /></label>
+            <label>Senha <input name="senha" type="password" required /></label>
+            <button class="button primary" type="submit">Entrar</button>
+          </form>
+        </div>
+
+        <section class="dashboard hidden" id="collectorPanel">
+          <article class="profile panel">
+            <div class="avatar" id="avatar">MF</div>
+            <div>
+              <p class="eyebrow">Colecionador</p>
+              <h3 id="profileName">Nome</h3>
+              <p>Conta MiniFlex</p>
+            </div>
+            <button class="button ghost logout-button" data-logout type="button">Sair da conta</button>
+          </article>
+
+          <article class="panel progress-panel">
+            <div class="progress-label">
+              <strong id="progressText">0 / 10 animais</strong>
+              <span id="statusText">Colecao em andamento</span>
+            </div>
+            <div class="progress-bar" aria-label="Barra de progresso da colecao">
+              <span id="progressFill"></span>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h3>Pacotes comprados</h3>
+            <p class="big-number" id="packageCount">0</p>
+          </article>
+
+          <article class="panel">
+            <h3>Conquistas</h3>
+            <div class="badge-list" id="achievementList"></div>
+          </article>
+        </section>
+      </section>
+
+      <section class="view" id="view-collection">
+        <div class="section-heading">
+          <p class="eyebrow">Temporadas</p>
+          <h2>Animais da colecao</h2>
+        </div>
+        <div class="season-filter">
+          <label>Temporada <select id="publicSeasonSelect"></select></label>
+        </div>
+        <div class="animal-grid" id="collectionGrid"></div>
+      </section>
+
+      <section class="view" id="view-ranking">
+        <div class="section-heading">
+          <p class="eyebrow">Competicao saudavel</p>
+          <h2>Ranking</h2>
+        </div>
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th>Posicao</th>
+                <th>Nome</th>
+                <th>Pacotes</th>
+                <th>Gold</th>
+                <th>Bicolor</th>
+                <th>Completa</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="view" id="view-hall">
+        <div class="section-heading">
+          <p class="eyebrow">Hall da Fama</p>
+          <h2>Medalhas MiniFlex</h2>
+        </div>
+        <div class="hall-grid" id="hallGrid"></div>
+      </section>
+
+      <section class="view" id="view-store">
+        <div class="section-heading">
+          <p class="eyebrow">Loja</p>
+          <h2>Pacotes e chances</h2>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-card">
+            <span>📦</span>
+            <h3>1 pacote</h3>
+            <strong>R$5</strong>
+          </article>
+          <article class="price-card featured">
+            <span>✨</span>
+            <h3>3 pacotes</h3>
+            <strong>R$12</strong>
+          </article>
+          <article class="price-card">
+            <span>🏅</span>
+            <h3>5 pacotes</h3>
+            <strong>R$20</strong>
+          </article>
+        </div>
+        <div class="rarity-strip">
+          <p><strong>Chance de encontrar:</strong></p>
+          <span class="rarity gold">Gold</span>
+          <span class="rarity bicolor">Bicolor</span>
+        </div>
+      </section>
+
+      <section class="view" id="view-admin">
+        <div class="section-heading">
+          <p class="eyebrow">Administracao</p>
+          <h2>Painel MiniFlex</h2>
+        </div>
+
+        <form class="panel form-inline" id="adminLoginForm">
+          <label>Senha admin <input name="senha" type="password" required /></label>
+          <button class="button primary" type="submit">Desbloquear</button>
+        </form>
+
+        <div class="admin-space hidden" id="adminPanel">
+          <div class="admin-summary" id="adminSummary"></div>
+
+          <div class="chart-grid">
+            <article class="panel"><h3>Pacotes vendidos</h3><canvas id="packagesChart" width="420" height="220"></canvas></article>
+            <article class="panel"><h3>Novos por semana</h3><canvas id="collectorsChart" width="420" height="220"></canvas></article>
+            <article class="panel"><h3>Gold x Bicolor</h3><canvas id="rarityChart" width="420" height="220"></canvas></article>
+            <article class="panel"><h3>Top compradores</h3><canvas id="buyersChart" width="420" height="220"></canvas></article>
+          </div>
+
+          <div class="admin-grid">
+            <form class="panel form-stack" id="catalogForm">
+              <h3>Cadastrar codigos</h3>
+              <label>Temporada <select name="temporada_id" data-admin-seasons></select></label>
+              <label>Codigos <textarea name="codes" rows="5" placeholder="CAT-0031&#10;CAT-0032"></textarea></label>
+              <button class="button primary" type="submit">Salvar codigos</button>
+            </form>
+
+            <form class="panel form-stack" id="manualUserForm">
+              <h3>Novo usuario manual</h3>
+              <label>Nome <input name="nome" required /></label>
+              <label>Codigo <input name="codigo_catalogo" placeholder="CAT-0031" /></label>
+              <label>Senha <input name="senha" value="miniflex123" /></label>
+              <label>Pacotes iniciais <input name="quantidade_pacotes" type="number" min="0" value="0" /></label>
+              <button class="button primary" type="submit">Criar usuario</button>
+            </form>
+
+            <form class="panel form-stack" id="purchaseForm">
+              <h3>Adicionar compra</h3>
+              <label>Usuario <select name="usuario_id" data-admin-users></select></label>
+              <label>Pacotes <input name="quantidade_pacotes" type="number" min="1" value="1" /></label>
+              <button class="button primary" type="submit">Adicionar</button>
+            </form>
+
+            <form class="panel form-stack" id="editUserForm">
+              <h3>Editar informacoes</h3>
+              <label>Usuario <select name="usuario_id" data-admin-users></select></label>
+              <label>Nome <input name="nome" /></label>
+              <label>Pacotes totais <input name="quantidade_pacotes" type="number" min="0" /></label>
+              <label>Nova senha <input name="senha" placeholder="Opcional" /></label>
+              <button class="button primary" type="submit">Atualizar</button>
+            </form>
+          </div>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <h3>Confirmar animais</h3>
+              <label>Usuario <select id="animalUserSelect" data-admin-users></select></label>
+            </div>
+            <div class="animal-admin-list" id="animalAdminList"></div>
+            <button class="button primary" id="saveAnimalsButton">Atualizar progresso</button>
+          </section>
+
+          <section class="admin-grid">
+            <form class="panel form-stack" id="seasonForm">
+              <h3>Criar nova temporada</h3>
+              <label>Nome <input name="nome" placeholder="Temporada 2" required /></label>
+              <label>Imagem <input name="imagem" placeholder="/assets/temporada-2.png" /></label>
+              <label>Animais <textarea name="animais" rows="6" placeholder="001 Gato&#10;002 Dragao&#10;003 Robo"></textarea></label>
+              <button class="button primary" type="submit">Criar temporada</button>
+              <label>Temporada ativa <select id="activateSeasonSelect"></select></label>
+              <button class="button ghost" id="activateSeasonButton">Ativar temporada</button>
+            </form>
+
+            <article class="panel form-stack">
+              <h3>Backup CSV</h3>
+              <div class="button-row">
+                <button class="button ghost" data-export="usuarios">Usuarios</button>
+                <button class="button ghost" data-export="catalogos">Catalogos</button>
+                <button class="button ghost" data-export="conquistas">Conquistas</button>
+                <button class="button ghost" data-export="animais">Animais</button>
+                <button class="button ghost" data-export="compras">Compras</button>
+              </div>
+              <label>Importar catalogos <textarea id="catalogImport" rows="4" placeholder="codigo&#10;CAT-0100"></textarea></label>
+              <button class="button primary" id="importCatalogsButton">Importar catalogos</button>
+              <label>Importar usuarios <textarea id="userImport" rows="4" placeholder="nome,codigo_catalogo,senha,quantidade_pacotes"></textarea></label>
+              <button class="button primary" id="importUsersButton">Importar usuarios</button>
+            </article>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>
