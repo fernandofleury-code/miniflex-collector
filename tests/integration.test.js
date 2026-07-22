@@ -67,6 +67,20 @@ test("collector registration, dashboard and admin overview work", async () => {
     });
     assert.equal(overview.data.users.length, 1);
 
+    await jsonFetch(`${baseUrl}/api/admin/users/${register.data.user.id}/purchases`, {
+      method: "POST",
+      cookie: adminLogin.cookie,
+      body: { quantidade_pacotes: 2 },
+    });
+    const rankingAfterPurchase = await jsonFetch(`${baseUrl}/api/public/ranking`);
+    assert.equal(rankingAfterPurchase.data.ranking.length, 1);
+    assert.equal(rankingAfterPurchase.data.ranking[0].nome, "Aluno Teste");
+
+    const hallAfterPurchase = await jsonFetch(`${baseUrl}/api/public/hall`);
+    assert.equal(hallAfterPurchase.data.firstBuyer.nome, "Aluno Teste");
+    assert.equal(hallAfterPurchase.data.topGold.length, 0);
+    assert.equal(hallAfterPurchase.data.topBicolor.length, 0);
+
     await jsonFetch(`${baseUrl}/api/admin/users/${register.data.user.id}/animals`, {
       method: "POST",
       cookie: adminLogin.cookie,
@@ -89,17 +103,9 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(variantDashboard.data.animals[0].bicolor, 1);
     assert.equal(variantDashboard.data.owned, 0);
 
-    await jsonFetch(`${baseUrl}/api/admin/users/${register.data.user.id}/purchases`, {
-      method: "POST",
-      cookie: adminLogin.cookie,
-      body: { quantidade_pacotes: 2 },
-    });
-    const rankingAfterPurchase = await jsonFetch(`${baseUrl}/api/public/ranking`);
-    assert.equal(rankingAfterPurchase.data.ranking.length, 1);
-    assert.equal(rankingAfterPurchase.data.ranking[0].nome, "Aluno Teste");
-
-    const hallAfterPurchase = await jsonFetch(`${baseUrl}/api/public/hall`);
-    assert.equal(hallAfterPurchase.data.firstBuyer.nome, "Aluno Teste");
+    const hallAfterRarity = await jsonFetch(`${baseUrl}/api/public/hall`);
+    assert.equal(hallAfterRarity.data.topGold.length, 1);
+    assert.equal(hallAfterRarity.data.topBicolor.length, 1);
   } finally {
     await new Promise((resolve) => server.close(resolve));
     const { resetDbForTests } = await import("../src/db/database.js");

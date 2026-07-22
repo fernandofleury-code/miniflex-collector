@@ -158,6 +158,11 @@ publicRoutes.get("/hall", async (req, res) => {
 });
 
 async function topList(db, seasonId, orderField, valueName) {
+  const positiveRarityFilter = {
+    gold: "HAVING COALESCE(SUM(ua.gold), 0) > 0",
+    bicolor: "HAVING COALESCE(SUM(ua.bicolor), 0) > 0",
+  }[valueName] || "";
+
   return (await db
     .prepare(
       `
@@ -170,6 +175,7 @@ async function topList(db, seasonId, orderField, valueName) {
       LEFT JOIN usuario_animais ua ON ua.usuario_id = u.id
       WHERE u.temporada_id = ? AND u.quantidade_pacotes > 0
       GROUP BY u.id
+      ${positiveRarityFilter}
       ORDER BY ${orderField} DESC, u.data_cadastro ASC
       LIMIT 10
       `,
