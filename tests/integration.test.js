@@ -127,6 +127,26 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(overviewAfterRarity.data.traffic.summary.packages, 2);
     assert.equal(overviewAfterRarity.data.traffic.summary.goldRegistered, 1);
     assert.equal(overviewAfterRarity.data.traffic.summary.bicolorRegistered, 1);
+
+    await jsonFetch(`${baseUrl}/api/admin/users/${register.data.user.id}`, {
+      method: "PATCH",
+      cookie: adminLogin.cookie,
+      body: {
+        nome: "Aluno Teste",
+        quantidade_pacotes: 2,
+        ignorar_fluxo: true,
+      },
+    });
+    const ignoredOverview = await jsonFetch(`${baseUrl}/api/admin/overview`, {
+      cookie: adminLogin.cookie,
+    });
+    assert.equal(ignoredOverview.data.traffic.summary.pageViews, 0);
+    assert.equal(ignoredOverview.data.traffic.summary.uniqueVisitors, 0);
+    assert.equal(ignoredOverview.data.traffic.summary.logins, 0);
+    assert.equal(ignoredOverview.data.traffic.summary.newAccounts, 0);
+    assert.equal(ignoredOverview.data.traffic.summary.packages, 0);
+    assert.equal(ignoredOverview.data.traffic.summary.goldRegistered, 0);
+    assert.equal(ignoredOverview.data.traffic.summary.bicolorRegistered, 0);
   } finally {
     await new Promise((resolve) => server.close(resolve));
     const { resetDbForTests } = await import("../src/db/database.js");

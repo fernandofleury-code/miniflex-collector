@@ -11,7 +11,11 @@ import {
   getUserCollection,
   userPublicFields,
 } from "../services/collectionService.js";
-import { getTrafficData, trackEvent } from "../services/analyticsService.js";
+import {
+  getTrafficData,
+  rememberIgnoredVisitorsForUser,
+  trackEvent,
+} from "../services/analyticsService.js";
 import { hashPassword } from "../utils/security.js";
 import { parseCsv, rowsToObjects, stringifyCsv } from "../utils/csv.js";
 
@@ -60,6 +64,7 @@ adminRoutes.get("/overview", async (req, res) => {
       gold: user.gold,
       bicolor: user.bicolor,
       animais_possuidos: user.animais_possuidos,
+      ignorar_fluxo: Boolean(user.ignorar_fluxo),
     }));
 
   const catalogs = (await db
@@ -186,20 +191,30 @@ adminRoutes.patch("/users/:id", async (req, res) => {
 
   const nome = String(req.body.nome || user.nome).trim();
   const pacotes = Math.max(0, Number(req.body.quantidade_pacotes ?? user.quantidade_pacotes));
+  const ignoreFlow =
+    req.body.ignorar_fluxo === undefined ? Number(user.ignorar_fluxo) : req.body.ignorar_fluxo ? 1 : 0;
 
   if (req.body.senha) {
-    await db.prepare("UPDATE usuarios SET nome = ?, quantidade_pacotes = ?, senha = ? WHERE id = ?").run(
+    await db.prepare(
+      "UPDATE usuarios SET nome = ?, quantidade_pacotes = ?, senha = ?, ignorar_fluxo = ? WHERE id = ?",
+    ).run(
       nome,
       pacotes,
       hashPassword(String(req.body.senha)),
+      ignoreFlow,
       userId,
     );
   } else {
-    await db.prepare("UPDATE usuarios SET nome = ?, quantidade_pacotes = ? WHERE id = ?").run(
+    await db.prepare("UPDATE usuarios SET nome = ?, quantidade_pacotes = ?, ignorar_fluxo = ? WHERE id = ?").run(
       nome,
       pacotes,
+      ignoreFlow,
       userId,
     );
+  }
+
+  if (ignoreFlow) {
+    await rememberIgnoredVisitorsForUser(db, userId);
   }
 
   res.json({

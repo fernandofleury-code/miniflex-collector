@@ -130,5 +130,6 @@ export function userPublicFields(row) {
     colecao_completa: Boolean(row.colecao_completa),
     data_completou: row.data_completou,
     temporada_id: row.temporada_id,
+    ignorar_fluxo: Boolean(row.ignorar_fluxo),
   };
 }

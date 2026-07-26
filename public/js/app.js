@@ -168,6 +168,7 @@ function bindAdmin() {
     const payload = {
       nome: data.nome,
       quantidade_pacotes: Number(data.quantidade_pacotes),
+      ignorar_fluxo: event.currentTarget.ignorar_fluxo.checked,
     };
     if (data.senha) payload.senha = data.senha;
     await adminAction(`/api/admin/users/${data.usuario_id}`, payload, "Usuario atualizado.", "PATCH");
@@ -565,6 +566,7 @@ function fillEditUserForm(userId) {
   form.nome.value = user.nome;
   form.quantidade_pacotes.value = user.quantidade_pacotes;
   form.senha.value = "";
+  form.ignorar_fluxo.checked = Boolean(user.ignorar_fluxo);
 }
 
 function animalCard(animal, owned) {

@@ -222,6 +222,13 @@ async function migrate(db) {
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
     );
 
+    CREATE TABLE IF NOT EXISTS visitantes_ignorados (
+      visitor_id TEXT PRIMARY KEY,
+      usuario_id INTEGER,
+      data TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+    );
+
     CREATE INDEX IF NOT EXISTS usuarios_temporada_idx ON usuarios (temporada_id);
     CREATE INDEX IF NOT EXISTS catalogos_temporada_idx ON catalogos (temporada_id);
     CREATE INDEX IF NOT EXISTS conquistas_usuario_idx ON conquistas (usuario_id);
@@ -230,7 +237,17 @@ async function migrate(db) {
     CREATE INDEX IF NOT EXISTS eventos_site_data_idx ON eventos_site (data);
     CREATE INDEX IF NOT EXISTS eventos_site_tipo_idx ON eventos_site (tipo);
     CREATE INDEX IF NOT EXISTS eventos_site_visitor_idx ON eventos_site (visitor_id);
+    CREATE INDEX IF NOT EXISTS visitantes_ignorados_usuario_idx ON visitantes_ignorados (usuario_id);
   `);
+
+  await addColumnIfMissing(db, "usuarios", "ignorar_fluxo", "ignorar_fluxo INTEGER NOT NULL DEFAULT 0");
+}
+
+async function addColumnIfMissing(db, table, column, definition) {
+  const columns = await db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!columns.some((item) => item.name === column)) {
+    await db.exec(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
+  }
 }
 
 async function seed(db) {
