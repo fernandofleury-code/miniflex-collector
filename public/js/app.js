@@ -9,9 +9,12 @@ const state = {
   adminCollection: null,
   refreshTimer: null,
   isRefreshingCollector: false,
+  trafficRange: "today",
+  trafficDate: "",
 };
 
 const AUTO_REFRESH_MS = 4000;
+const VISITOR_KEY = "miniflex_visitor_id";
 
 const animalIcons = {
   tubarao: "🦈",
@@ -48,6 +51,7 @@ async function init() {
   await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection()]);
   await loadDashboard();
   if (state.admin) await loadAdmin();
+  trackPageView(state.view);
 }
 
 function bindNavigation() {
@@ -221,12 +225,23 @@ function bindAdmin() {
       "Usuarios importados.",
     );
   });
+
+  $("#trafficRange").addEventListener("change", async (event) => {
+    state.trafficRange = event.target.value;
+    if (state.admin) await loadAdmin();
+  });
+
+  $("#trafficDate").addEventListener("change", async (event) => {
+    state.trafficDate = event.target.value;
+    if (state.trafficRange === "date" && state.admin) await loadAdmin();
+  });
 }
 
 function showView(view) {
   state.view = view;
   $$(".view").forEach((section) => section.classList.toggle("is-visible", section.id === `view-${view}`));
   $$(".nav-link").forEach((link) => link.classList.toggle("is-active", link.dataset.viewLink === view));
+  trackPageView(view);
 
   if (view === "dashboard") loadDashboard();
   if (view === "admin" && state.admin) loadAdmin();
@@ -399,7 +414,12 @@ async function loadHall() {
 async function loadAdmin() {
   $("#adminLoginForm").classList.add("hidden");
   $("#adminPanel").classList.remove("hidden");
-  const data = await api(`/api/admin/overview?season_id=${state.selectedSeasonId}`);
+  const params = new URLSearchParams({
+    season_id: state.selectedSeasonId,
+    traffic_range: state.trafficRange,
+  });
+  if (state.trafficDate) params.set("traffic_date", state.trafficDate);
+  const data = await api(`/api/admin/overview?${params}`);
   state.adminData = data;
   renderAdmin(data);
   await loadAdminCollection();
@@ -439,6 +459,40 @@ function renderAdmin(data) {
   drawBarChart("collectorsChart", data.charts.weekUsers, "#c89213");
   drawRarityChart("rarityChart", data.charts.rarity);
   drawBarChart("buyersChart", data.charts.buyers, "#0aa6c2");
+  renderTraffic(data.traffic);
+}
+
+function renderTraffic(traffic) {
+  state.trafficRange = traffic.period.range;
+  if (traffic.period.range === "date") state.trafficDate = traffic.period.start;
+
+  $("#trafficRange").value = state.trafficRange;
+  $("#trafficDate").value = state.trafficDate || traffic.period.start;
+  $("#trafficDate").disabled = state.trafficRange !== "date";
+
+  $("#trafficSummary").innerHTML = [
+    ["ðŸ‘", "Visitas", traffic.summary.pageViews],
+    ["ðŸ‘¥", "Visitantes", traffic.summary.uniqueVisitors],
+    ["ðŸ”", "Logins", traffic.summary.logins],
+    ["âœ…", "Novas contas", traffic.summary.newAccounts],
+    ["ðŸ“¦", "Pacotes", traffic.summary.packages],
+    ["â­", "Gold", traffic.summary.goldRegistered],
+    ["ðŸŽ¨", "Bicolor", traffic.summary.bicolorRegistered],
+  ]
+    .map(
+      ([icon, label, value]) => `
+      <article class="metric-card">
+        <span>${icon}</span><strong>${value}</strong><p>${label}</p>
+      </article>
+    `,
+    )
+    .join("");
+
+  drawBarChart(
+    "trafficChart",
+    traffic.daily.map((row) => ({ label: row.label, value: row.page_views })),
+    "#1168d8",
+  );
 }
 
 async function loadAdminCollection() {
@@ -626,7 +680,10 @@ function formJson(form) {
 async function api(path, options = {}) {
   const fetchOptions = {
     method: options.method || "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-MiniFlex-Visitor-Id": getVisitorId(),
+    },
   };
 
   if (options.body !== undefined) fetchOptions.body = JSON.stringify(options.body);
@@ -637,6 +694,27 @@ async function api(path, options = {}) {
 
   if (!response.ok) throw new Error(data.error || "Nao foi possivel concluir a acao.");
   return data;
+}
+
+function trackPageView(view) {
+  api("/api/public/track", {
+    method: "POST",
+    body: {
+      view,
+      path: window.location.pathname + window.location.hash,
+    },
+  }).catch(() => {});
+}
+
+function getVisitorId() {
+  let visitorId = localStorage.getItem(VISITOR_KEY);
+  if (!visitorId) {
+    visitorId = window.crypto?.randomUUID
+      ? window.crypto.randomUUID()
+      : `v-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(VISITOR_KEY, visitorId);
+  }
+  return visitorId;
 }
 
 function medal(position) {

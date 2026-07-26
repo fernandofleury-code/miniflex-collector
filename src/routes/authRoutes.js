@@ -7,6 +7,7 @@ import {
   normalizeCode,
   userPublicFields,
 } from "../services/collectionService.js";
+import { trackEvent, visitorIdFromRequest } from "../services/analyticsService.js";
 import { hashPassword, verifyPassword } from "../utils/security.js";
 
 export const authRoutes = Router();
@@ -45,6 +46,12 @@ authRoutes.post("/register", async (req, res) => {
 
   await createSession(res, { userId });
   const user = await db.prepare("SELECT * FROM usuarios WHERE id = ?").get(userId);
+  await trackEvent(db, {
+    tipo: "account_created",
+    visitorId: visitorIdFromRequest(req),
+    userId,
+    rota: "register",
+  });
   res.status(201).json({ user: userPublicFields(user) });
 });
 
@@ -70,6 +77,12 @@ authRoutes.post("/login", async (req, res) => {
   }
 
   await createSession(res, { userId: user.id });
+  await trackEvent(db, {
+    tipo: "login",
+    visitorId: visitorIdFromRequest(req),
+    userId: user.id,
+    rota: "login",
+  });
   res.json({ user: userPublicFields(user) });
 });
 

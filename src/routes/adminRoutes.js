@@ -11,6 +11,7 @@ import {
   getUserCollection,
   userPublicFields,
 } from "../services/collectionService.js";
+import { getTrafficData, trackEvent } from "../services/analyticsService.js";
 import { hashPassword } from "../utils/security.js";
 import { parseCsv, rowsToObjects, stringifyCsv } from "../utils/csv.js";
 
@@ -102,6 +103,10 @@ adminRoutes.get("/overview", async (req, res) => {
     catalogs,
     totals,
     charts: await getChartData(db, seasonId),
+    traffic: await getTrafficData(db, seasonId, {
+      range: String(req.query.traffic_range || "today"),
+      date: String(req.query.traffic_date || ""),
+    }),
   });
 });
 
@@ -256,6 +261,9 @@ adminRoutes.post("/users/:id/animals", async (req, res) => {
     const possui = record.possui ? 1 : 0;
     const gold = record.gold ? 1 : 0;
     const bicolor = record.bicolor ? 1 : 0;
+    const previous = (await db
+      .prepare("SELECT gold, bicolor FROM usuario_animais WHERE usuario_id = ? AND animal_id = ?")
+      .get(userId, animalId)) || { gold: 0, bicolor: 0 };
 
     await db.prepare(
       `
@@ -270,6 +278,24 @@ adminRoutes.post("/users/:id/animals", async (req, res) => {
         atualizado_em = datetime('now')
       `,
     ).run(userId, animalId, possui, gold, bicolor);
+
+    if (Boolean(previous.gold) !== Boolean(gold)) {
+      await trackEvent(db, {
+        tipo: gold ? "gold_registered" : "gold_removed",
+        userId,
+        rota: "admin_animals",
+        detalhes: { animal_id: animalId },
+      });
+    }
+
+    if (Boolean(previous.bicolor) !== Boolean(bicolor)) {
+      await trackEvent(db, {
+        tipo: bicolor ? "bicolor_registered" : "bicolor_removed",
+        userId,
+        rota: "admin_animals",
+        detalhes: { animal_id: animalId },
+      });
+    }
   }
 
   const collection = await refreshUserProgress(db, userId);
@@ -311,6 +337,7 @@ adminRoutes.get("/export/:entity", async (req, res) => {
     conquistas: "SELECT id, usuario_id, nome_conquista, data, temporada_id FROM conquistas ORDER BY id",
     animais: "SELECT id, temporada_id, numero, nome FROM animais ORDER BY temporada_id, numero",
     compras: "SELECT id, usuario_id, quantidade_pacotes, data FROM compras ORDER BY id",
+    eventos_site: "SELECT id, tipo, visitor_id, usuario_id, rota, detalhes, data FROM eventos_site ORDER BY id",
   };
 
   if (!allowed[entity]) {

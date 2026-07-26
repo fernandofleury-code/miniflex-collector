@@ -203,6 +203,25 @@
         <div class="admin-space hidden" id="adminPanel">
           <div class="admin-summary" id="adminSummary"></div>
 
+          <section class="panel traffic-panel">
+            <div class="panel-heading">
+              <h3>Fluxo do site</h3>
+              <div class="traffic-controls">
+                <label>Periodo
+                  <select id="trafficRange">
+                    <option value="today">Hoje</option>
+                    <option value="yesterday">Ontem</option>
+                    <option value="7days">Ultimos 7 dias</option>
+                    <option value="date">Escolher data</option>
+                  </select>
+                </label>
+                <label>Data <input id="trafficDate" type="date" /></label>
+              </div>
+            </div>
+            <div class="admin-summary traffic-summary" id="trafficSummary"></div>
+            <canvas id="trafficChart" width="920" height="230"></canvas>
+          </section>
+
           <div class="chart-grid">
             <article class="panel"><h3>Pacotes vendidos</h3><canvas id="packagesChart" width="420" height="220"></canvas></article>
             <article class="panel"><h3>Novos por semana</h3><canvas id="collectorsChart" width="420" height="220"></canvas></article>
@@ -272,6 +291,7 @@
                 <button class="button ghost" data-export="conquistas">Conquistas</button>
                 <button class="button ghost" data-export="animais">Animais</button>
                 <button class="button ghost" data-export="compras">Compras</button>
+                <button class="button ghost" data-export="eventos_site">Fluxo</button>
               </div>
               <label>Importar catalogos <textarea id="catalogImport" rows="4" placeholder="codigo&#10;CAT-0100"></textarea></label>
               <button class="button primary" id="importCatalogsButton">Importar catalogos</button>

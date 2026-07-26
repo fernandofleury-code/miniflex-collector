@@ -12,13 +12,22 @@ test("collector registration, dashboard and admin overview work", async () => {
   const app = await createApp();
   const server = app.listen(0);
   const baseUrl = `http://127.0.0.1:${server.address().port}`;
+  const visitorId = "visitor-test";
 
   try {
     const health = await jsonFetch(`${baseUrl}/health`);
     assert.equal(health.data.ok, true);
 
+    const tracked = await jsonFetch(`${baseUrl}/api/public/track`, {
+      method: "POST",
+      visitorId,
+      body: { view: "home", path: "/" },
+    });
+    assert.equal(tracked.data.ok, true);
+
     const register = await jsonFetch(`${baseUrl}/api/auth/register`, {
       method: "POST",
+      visitorId,
       body: {
         nome: "Aluno Teste",
         senha: "1234",
@@ -41,6 +50,7 @@ test("collector registration, dashboard and admin overview work", async () => {
 
     const collectorLogin = await jsonFetch(`${baseUrl}/api/auth/login`, {
       method: "POST",
+      visitorId,
       body: {
         nome: "Aluno Teste",
         senha: "1234",
@@ -66,6 +76,10 @@ test("collector registration, dashboard and admin overview work", async () => {
       cookie: adminLogin.cookie,
     });
     assert.equal(overview.data.users.length, 1);
+    assert.equal(overview.data.traffic.summary.pageViews, 1);
+    assert.equal(overview.data.traffic.summary.uniqueVisitors, 1);
+    assert.equal(overview.data.traffic.summary.newAccounts, 1);
+    assert.equal(overview.data.traffic.summary.logins, 1);
 
     await jsonFetch(`${baseUrl}/api/admin/users/${register.data.user.id}/purchases`, {
       method: "POST",
@@ -106,6 +120,13 @@ test("collector registration, dashboard and admin overview work", async () => {
     const hallAfterRarity = await jsonFetch(`${baseUrl}/api/public/hall`);
     assert.equal(hallAfterRarity.data.topGold.length, 1);
     assert.equal(hallAfterRarity.data.topBicolor.length, 1);
+
+    const overviewAfterRarity = await jsonFetch(`${baseUrl}/api/admin/overview`, {
+      cookie: adminLogin.cookie,
+    });
+    assert.equal(overviewAfterRarity.data.traffic.summary.packages, 2);
+    assert.equal(overviewAfterRarity.data.traffic.summary.goldRegistered, 1);
+    assert.equal(overviewAfterRarity.data.traffic.summary.bicolorRegistered, 1);
   } finally {
     await new Promise((resolve) => server.close(resolve));
     const { resetDbForTests } = await import("../src/db/database.js");
@@ -120,6 +141,7 @@ async function jsonFetch(url, options = {}) {
     headers: {
       "Content-Type": "application/json",
       ...(options.cookie ? { Cookie: options.cookie } : {}),
+      ...(options.visitorId ? { "X-MiniFlex-Visitor-Id": options.visitorId } : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });

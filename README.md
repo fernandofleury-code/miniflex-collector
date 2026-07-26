@@ -76,7 +76,10 @@ ADMIN_PASSWORD=sua-senha npm start
 - Colecao com 10 animais, aparecendo cinza ate o registro administrativo.
 - Painel admin para codigos, usuarios, compras, Gold, Bicolor, progresso e temporadas.
 - Graficos administrativos em canvas.
+- Fluxo do site no Admin com visitas, visitantes aproximados, logins, contas, compras, Gold e Bicolor por periodo.
 - Importacao e exportacao CSV para backup.
+
+O fluxo de visitas comeca a contar a partir do momento em que a versao com rastreamento estiver publicada.
 
 ## Testes
 

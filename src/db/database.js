@@ -211,11 +211,25 @@ async function migrate(db) {
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS eventos_site (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tipo TEXT NOT NULL,
+      visitor_id TEXT,
+      usuario_id INTEGER,
+      rota TEXT,
+      detalhes TEXT,
+      data TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+    );
+
     CREATE INDEX IF NOT EXISTS usuarios_temporada_idx ON usuarios (temporada_id);
     CREATE INDEX IF NOT EXISTS catalogos_temporada_idx ON catalogos (temporada_id);
     CREATE INDEX IF NOT EXISTS conquistas_usuario_idx ON conquistas (usuario_id);
     CREATE INDEX IF NOT EXISTS usuario_animais_usuario_idx ON usuario_animais (usuario_id);
     CREATE INDEX IF NOT EXISTS compras_usuario_idx ON compras (usuario_id);
+    CREATE INDEX IF NOT EXISTS eventos_site_data_idx ON eventos_site (data);
+    CREATE INDEX IF NOT EXISTS eventos_site_tipo_idx ON eventos_site (tipo);
+    CREATE INDEX IF NOT EXISTS eventos_site_visitor_idx ON eventos_site (visitor_id);
   `);
 }
 

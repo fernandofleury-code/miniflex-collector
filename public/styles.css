@@ -727,6 +727,23 @@ th {
   gap: 12px;
 }
 
+.traffic-panel canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 12px;
+}
+
+.traffic-controls {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 10px;
+}
+
+.traffic-summary {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
 .admin-grid,
 .chart-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -898,6 +915,10 @@ th {
   }
 
   .animal-admin-row {
+    grid-template-columns: 1fr;
+  }
+
+  .traffic-controls {
     grid-template-columns: 1fr;
   }
 

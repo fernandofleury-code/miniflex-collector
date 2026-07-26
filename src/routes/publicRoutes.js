@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getDb } from "../db/database.js";
 import { getActiveSeason } from "../services/collectionService.js";
+import { trackEvent, visitorIdFromRequest } from "../services/analyticsService.js";
 
 export const publicRoutes = Router();
 
@@ -77,6 +78,29 @@ publicRoutes.get("/seasons", async (_req, res) => {
     .all())
     .map((season) => ({ ...season, ativa: Boolean(season.ativa) }));
   res.json({ seasons });
+});
+
+publicRoutes.post("/track", async (req, res) => {
+  const db = await getDb();
+  const visitorId = visitorIdFromRequest(req);
+  const view = String(req.body.view || "unknown").trim().slice(0, 60);
+
+  if (!visitorId) {
+    res.json({ ok: true });
+    return;
+  }
+
+  await trackEvent(db, {
+    tipo: "page_view",
+    visitorId,
+    userId: req.user?.id,
+    rota: view,
+    detalhes: {
+      path: String(req.body.path || "").slice(0, 120),
+    },
+  });
+
+  res.json({ ok: true });
 });
 
 publicRoutes.get("/collection", async (req, res) => {
