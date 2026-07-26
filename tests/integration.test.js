@@ -81,6 +81,30 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(overview.data.traffic.summary.newAccounts, 1);
     assert.equal(overview.data.traffic.summary.logins, 1);
 
+    const adminDeviceId = "admin-device-test";
+    await jsonFetch(`${baseUrl}/api/public/track`, {
+      method: "POST",
+      visitorId: adminDeviceId,
+      body: { view: "admin", path: "/#admin" },
+    });
+    const overviewWithAdminVisit = await jsonFetch(`${baseUrl}/api/admin/overview`, {
+      cookie: adminLogin.cookie,
+    });
+    assert.equal(overviewWithAdminVisit.data.traffic.summary.pageViews, 2);
+    assert.equal(overviewWithAdminVisit.data.traffic.summary.uniqueVisitors, 2);
+
+    await jsonFetch(`${baseUrl}/api/admin/ignore-current-visitor`, {
+      method: "POST",
+      cookie: adminLogin.cookie,
+      visitorId: adminDeviceId,
+      body: {},
+    });
+    const overviewAfterDeviceIgnore = await jsonFetch(`${baseUrl}/api/admin/overview`, {
+      cookie: adminLogin.cookie,
+    });
+    assert.equal(overviewAfterDeviceIgnore.data.traffic.summary.pageViews, 1);
+    assert.equal(overviewAfterDeviceIgnore.data.traffic.summary.uniqueVisitors, 1);
+
     await jsonFetch(`${baseUrl}/api/admin/users/${register.data.user.id}/purchases`, {
       method: "POST",
       cookie: adminLogin.cookie,

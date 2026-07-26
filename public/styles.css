@@ -746,8 +746,13 @@ th {
 
 .traffic-controls {
   display: grid;
-  grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr);
+  grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr) auto;
   gap: 10px;
+}
+
+.traffic-controls .button {
+  align-self: end;
+  white-space: nowrap;
 }
 
 .traffic-summary {

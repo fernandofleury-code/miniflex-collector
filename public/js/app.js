@@ -236,6 +236,15 @@ function bindAdmin() {
     state.trafficDate = event.target.value;
     if (state.trafficRange === "date" && state.admin) await loadAdmin();
   });
+
+  $("#ignoreDeviceButton").addEventListener("click", async (event) => {
+    event.preventDefault();
+    await adminAction(
+      "/api/admin/ignore-current-visitor",
+      {},
+      "Este dispositivo nao entra mais no fluxo.",
+    );
+  });
 }
 
 function showView(view) {

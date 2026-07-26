@@ -13,8 +13,10 @@ import {
 } from "../services/collectionService.js";
 import {
   getTrafficData,
+  rememberIgnoredVisitor,
   rememberIgnoredVisitorsForUser,
   trackEvent,
+  visitorIdFromRequest,
 } from "../services/analyticsService.js";
 import { hashPassword } from "../utils/security.js";
 import { parseCsv, rowsToObjects, stringifyCsv } from "../utils/csv.js";
@@ -113,6 +115,22 @@ adminRoutes.get("/overview", async (req, res) => {
       date: String(req.query.traffic_date || ""),
     }),
   });
+});
+
+adminRoutes.post("/ignore-current-visitor", async (req, res) => {
+  const db = await getDb();
+  const visitorId = visitorIdFromRequest(req);
+  const userId = Number(req.body.usuario_id) || null;
+
+  if (!visitorId) {
+    res.status(400).json({ error: "Este navegador ainda nao tem identificador de visita." });
+    return;
+  }
+
+  await rememberIgnoredVisitor(db, visitorId, userId);
+  await db.prepare("DELETE FROM eventos_site WHERE visitor_id = ?").run(visitorId);
+
+  res.json({ ok: true });
 });
 
 adminRoutes.post("/catalogs", async (req, res) => {
