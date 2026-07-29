@@ -31,6 +31,18 @@ const animalIcons = {
   tatu: "🛡️",
 };
 
+const animalImages = {
+  tubarao: "/assets/animals/tubarao.webp",
+  hipopotamo: "/assets/animals/hipopotamo.webp",
+  lontra: "/assets/animals/lontra.webp",
+  polvo: "/assets/animals/polvo.webp",
+  raposa: "/assets/animals/raposa.webp",
+  caranguejo: "/assets/animals/caranguejo.webp",
+  elefante: "/assets/animals/elefante.webp",
+  capivara: "/assets/animals/capivara.webp",
+  tatu: "/assets/animals/tatu.webp",
+};
+
 const animalFacts = {
   tubarao:
     "O tubarão é uma espécie mais antiga que as árvores e sobreviveu a uma extinção em massa ocorrida no passado.",
@@ -627,7 +639,7 @@ function animalCard(animal, owned) {
       data-animal-name="${escapeHtml(animal.nome)}"
     >
       <span class="animal-number">${animal.numero}</span>
-      <div class="animal-figure">${animalIcons[key] || "◆"}</div>
+      <div class="animal-figure">${animalVisualMarkup(key, animal.nome)}</div>
       <h3>${escapeHtml(animal.nome)}</h3>
       <div class="badge-list">
         ${owned ? '<span class="badge">Normal</span>' : '<span class="badge">Não possuído</span>'}
@@ -650,7 +662,7 @@ function variantAnimalCard(animal, variant) {
       data-animal-name="${escapeHtml(animal.nome)}"
     >
       <span class="animal-number">${animal.numero}</span>
-      <div class="animal-figure">${animalIcons[key] || "◆"}</div>
+      <div class="animal-figure">${animalVisualMarkup(key, animal.nome)}</div>
       <h3>${escapeHtml(animal.nome)}</h3>
       <div class="badge-list">
         <span class="badge">${label}</span>
@@ -669,12 +681,13 @@ function openAnimalDetails(card) {
     bicolor: "Bicolor",
   };
   const detailCard = $("#animalDetailCard");
+  const animalName = card.dataset.animalName || "Animal";
   detailCard.className = `animal-detail-card is-${variant}`;
 
   $("#animalDetailVariant").textContent = variantLabels[variant] || "Normal";
-  $("#animalDetailFigure").textContent = animalIcons[key] || "◆";
+  $("#animalDetailFigure").innerHTML = animalVisualMarkup(key, animalName);
   $("#animalDetailNumber").textContent = card.dataset.animalNumber || "";
-  $("#animalDetailTitle").textContent = card.dataset.animalName || "Animal";
+  $("#animalDetailTitle").textContent = animalName;
   $("#animalDetailFact").textContent = animalFacts[key] || "Curiosidade em breve.";
 
   const dialog = $("#animalDetailDialog");
@@ -693,6 +706,18 @@ function animalKey(name) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "");
+}
+
+function animalVisualMarkup(key, name) {
+  const src = animalImages[key];
+  if (src) {
+    return `<img src="${src}" alt="MiniFlex ${escapeHtml(name)}" loading="lazy" />`;
+  }
+
+  return `
+    <span>${animalIcons[key] || "◆"}</span>
+    <small>Imagem em breve</small>
+  `;
 }
 
 function hallFeature(title, value) {

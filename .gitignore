@@ -41,5 +41,6 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+/tmp/
 /data/*.sqlite
 /data/*.sqlite-*
