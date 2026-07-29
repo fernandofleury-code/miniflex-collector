@@ -26,7 +26,7 @@ export const adminRoutes = Router();
 adminRoutes.post("/login", async (req, res) => {
   const configuredPassword = process.env.ADMIN_PASSWORD || "miniflex-admin";
   if (String(req.body.senha || "") !== configuredPassword) {
-    res.status(401).json({ error: "Senha administrativa invalida." });
+    res.status(401).json({ error: "Senha administrativa inválida." });
     return;
   }
 
@@ -123,7 +123,7 @@ adminRoutes.post("/ignore-current-visitor", async (req, res) => {
   const userId = Number(req.body.usuario_id) || null;
 
   if (!visitorId) {
-    res.status(400).json({ error: "Este navegador ainda nao tem identificador de visita." });
+    res.status(400).json({ error: "Este navegador ainda não tem identificador de visita." });
     return;
   }
 
@@ -171,7 +171,7 @@ adminRoutes.post("/users", async (req, res) => {
   }
 
   if (catalog.utilizado) {
-    res.status(409).json({ error: "Este codigo ja esta vinculado a outro usuario." });
+    res.status(409).json({ error: "Este código já está vinculado a outro usuário." });
     return;
   }
 
@@ -203,7 +203,7 @@ adminRoutes.patch("/users/:id", async (req, res) => {
   const userId = Number(req.params.id);
   const user = await db.prepare("SELECT * FROM usuarios WHERE id = ?").get(userId);
   if (!user) {
-    res.status(404).json({ error: "Usuario nao encontrado." });
+    res.status(404).json({ error: "Usuário não encontrado." });
     return;
   }
 
@@ -247,7 +247,7 @@ adminRoutes.post("/users/:id/purchases", async (req, res) => {
   const user = await db.prepare("SELECT * FROM usuarios WHERE id = ?").get(userId);
 
   if (!user || !Number.isInteger(quantity) || quantity <= 0) {
-    res.status(400).json({ error: "Usuario e quantidade de pacotes validos sao obrigatorios." });
+    res.status(400).json({ error: "Usuário e quantidade de pacotes válidos são obrigatórios." });
     return;
   }
 
@@ -259,7 +259,7 @@ adminRoutes.post("/users/:id/purchases", async (req, res) => {
 adminRoutes.get("/users/:id/collection", async (req, res) => {
   const collection = await getUserCollection(await getDb(), Number(req.params.id));
   if (!collection) {
-    res.status(404).json({ error: "Usuario nao encontrado." });
+    res.status(404).json({ error: "Usuário não encontrado." });
     return;
   }
 
@@ -280,7 +280,7 @@ adminRoutes.post("/users/:id/animals", async (req, res) => {
   const user = await db.prepare("SELECT * FROM usuarios WHERE id = ?").get(userId);
 
   if (!user) {
-    res.status(404).json({ error: "Usuario nao encontrado." });
+    res.status(404).json({ error: "Usuário não encontrado." });
     return;
   }
 
@@ -374,7 +374,7 @@ adminRoutes.get("/export/:entity", async (req, res) => {
   };
 
   if (!allowed[entity]) {
-    res.status(404).json({ error: "Exportacao nao encontrada." });
+    res.status(404).json({ error: "Exportação não encontrada." });
     return;
   }
 

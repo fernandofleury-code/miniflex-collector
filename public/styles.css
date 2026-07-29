@@ -544,6 +544,15 @@ textarea:focus {
   padding: 16px;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.animal-card:focus-visible {
+  outline: 4px solid rgba(17, 104, 216, 0.22);
+  outline-offset: 3px;
 }
 
 .animal-card.is-locked {
@@ -633,6 +642,123 @@ textarea:focus {
 
 .animal-card.is-locked .animal-figure {
   background: #a7b2c0;
+}
+
+.animal-detail-dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.animal-detail-dialog::backdrop {
+  background: rgba(6, 26, 51, 0.58);
+  backdrop-filter: blur(6px);
+}
+
+.animal-detail-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 32px 28px 30px;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff, #f6f9fd);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.animal-detail-card.is-gold {
+  background:
+    linear-gradient(#ffffff, #fff9e7) padding-box,
+    linear-gradient(135deg, #f8d763, var(--gold-600)) border-box;
+  border-color: transparent;
+}
+
+.animal-detail-card.is-bicolor {
+  background:
+    linear-gradient(#ffffff, #f7fbff) padding-box,
+    linear-gradient(135deg, var(--blue-600), #ec5aa6) border-box;
+  border-color: transparent;
+}
+
+.animal-detail-card.is-locked {
+  background: linear-gradient(135deg, #eef2f6, #ffffff);
+}
+
+.dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  margin: 0;
+}
+
+.animal-detail-kicker,
+.animal-detail-number {
+  margin: 0;
+  color: var(--gold-600);
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.animal-detail-kicker {
+  padding: 7px 10px;
+  background: var(--gold-100);
+  border: 1px solid #f3d77c;
+  border-radius: 999px;
+  font-size: 0.78rem;
+}
+
+.animal-detail-card.is-bicolor .animal-detail-kicker {
+  color: white;
+  background: linear-gradient(90deg, var(--blue-600), #ec5aa6);
+  border-color: transparent;
+}
+
+.animal-detail-card.is-locked .animal-detail-kicker {
+  color: #66758b;
+  background: #eef2f6;
+  border-color: #d8e0ea;
+}
+
+.animal-detail-figure {
+  display: grid;
+  width: 116px;
+  height: 116px;
+  margin-top: 6px;
+  place-items: center;
+  color: white;
+  background: var(--blue-600);
+  border-radius: 8px;
+  font-size: 3.7rem;
+}
+
+.animal-detail-card.is-gold .animal-detail-figure {
+  color: #4f3900;
+  background: linear-gradient(135deg, #fff3a7, var(--gold-400));
+}
+
+.animal-detail-card.is-bicolor .animal-detail-figure {
+  background: linear-gradient(135deg, var(--blue-600), #ec5aa6);
+}
+
+.animal-detail-card.is-locked .animal-detail-figure {
+  background: #a7b2c0;
+  filter: grayscale(0.85);
+}
+
+.animal-detail-card h3 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.animal-detail-fact {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.55;
 }
 
 .table-shell {

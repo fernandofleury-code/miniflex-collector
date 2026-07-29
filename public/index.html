@@ -6,7 +6,7 @@
     <title>MiniFlex Collector</title>
     <meta
       name="description"
-      content="Sistema de colecionadores MiniFlex com catalogos, rankings, conquistas e administracao."
+      content="Sistema de colecionadores MiniFlex com catálogos, rankings, conquistas e administração."
     />
     <link rel="stylesheet" href="/styles.css" />
   </head>
@@ -17,13 +17,13 @@
         <span>MiniFlex</span>
       </a>
 
-      <nav class="main-nav" aria-label="Navegacao principal">
-        <button class="nav-link is-active" data-view-link="home">Inicio</button>
-        <button class="nav-link" data-view-link="collection">Colecao</button>
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-link is-active" data-view-link="home">Início</button>
+        <button class="nav-link" data-view-link="collection">Coleção</button>
         <button class="nav-link" data-view-link="ranking">Ranking</button>
-        <button class="nav-link" data-view-link="hall">Hall</button>
+        <button class="nav-link" data-view-link="hall">Hall da Fama⭐</button>
         <button class="nav-link" data-view-link="store">Loja</button>
-        <button class="nav-link" data-view-link="dashboard">Minha area</button>
+        <button class="nav-link" data-view-link="dashboard">Minha área</button>
         <button class="nav-link nav-admin" data-view-link="admin">Admin</button>
         <button class="nav-link nav-logout hidden" data-logout type="button">Sair</button>
       </nav>
@@ -54,19 +54,19 @@
           <article class="spotlight">
             <span class="spotlight-icon">🏆</span>
             <p>Primeiro a completar</p>
-            <strong id="firstCompleter">Ainda ninguem</strong>
+            <strong id="firstCompleter">Ainda ninguém</strong>
           </article>
           <article class="spotlight">
             <span class="spotlight-icon">🥇</span>
             <p>Maior comprador</p>
-            <strong id="topBuyer">Ainda ninguem</strong>
+            <strong id="topBuyer">Ainda ninguém</strong>
           </article>
         </section>
       </section>
 
       <section class="view" id="view-dashboard">
         <div class="section-heading">
-          <p class="eyebrow">Area do colecionador</p>
+          <p class="eyebrow">Área do colecionador</p>
           <h2>Conta e progresso</h2>
         </div>
 
@@ -100,9 +100,9 @@
           <article class="panel progress-panel">
             <div class="progress-label">
               <strong id="progressText">0 / 10 animais</strong>
-              <span id="statusText">Colecao em andamento</span>
+              <span id="statusText">Coleção em andamento</span>
             </div>
-            <div class="progress-bar" aria-label="Barra de progresso da colecao">
+            <div class="progress-bar" aria-label="Barra de progresso da coleção">
               <span id="progressFill"></span>
             </div>
           </article>
@@ -122,7 +122,7 @@
       <section class="view" id="view-collection">
         <div class="section-heading">
           <p class="eyebrow">Temporadas</p>
-          <h2>Animais da colecao</h2>
+          <h2>Animais da coleção</h2>
         </div>
         <div class="season-filter">
           <label>Temporada <select id="publicSeasonSelect"></select></label>
@@ -139,7 +139,7 @@
           <table>
             <thead>
               <tr>
-                <th>Posicao</th>
+                <th>Posição</th>
                 <th>Nome</th>
                 <th>Pacotes</th>
                 <th>Gold</th>
@@ -191,7 +191,7 @@
 
       <section class="view" id="view-admin">
         <div class="section-heading">
-          <p class="eyebrow">Administracao</p>
+          <p class="eyebrow">Administração</p>
           <h2>Painel MiniFlex</h2>
         </div>
 
@@ -207,11 +207,11 @@
             <div class="panel-heading">
               <h3>Fluxo do site</h3>
               <div class="traffic-controls">
-                <label>Periodo
+                <label>Período
                   <select id="trafficRange">
                     <option value="today">Hoje</option>
                     <option value="yesterday">Ontem</option>
-                    <option value="7days">Ultimos 7 dias</option>
+                    <option value="7days">Últimos 7 dias</option>
                     <option value="date">Escolher data</option>
                   </select>
                 </label>
@@ -234,35 +234,35 @@
 
           <div class="admin-grid">
             <form class="panel form-stack" id="catalogForm">
-              <h3>Cadastrar codigos</h3>
+              <h3>Cadastrar códigos</h3>
               <label>Temporada <select name="temporada_id" data-admin-seasons></select></label>
-              <label>Codigos <textarea name="codes" rows="5" placeholder="CAT-0031&#10;CAT-0032"></textarea></label>
-              <button class="button primary" type="submit">Salvar codigos</button>
+              <label>Códigos <textarea name="codes" rows="5" placeholder="CAT-0031&#10;CAT-0032"></textarea></label>
+              <button class="button primary" type="submit">Salvar códigos</button>
             </form>
 
             <form class="panel form-stack" id="manualUserForm">
-              <h3>Novo usuario manual</h3>
+              <h3>Novo usuário manual</h3>
               <label>Nome <input name="nome" required /></label>
-              <label>Codigo <input name="codigo_catalogo" placeholder="CAT-0031" /></label>
+              <label>Código <input name="codigo_catalogo" placeholder="CAT-0031" /></label>
               <label>Senha <input name="senha" value="miniflex123" /></label>
               <label>Pacotes iniciais <input name="quantidade_pacotes" type="number" min="0" value="0" /></label>
-              <button class="button primary" type="submit">Criar usuario</button>
+              <button class="button primary" type="submit">Criar usuário</button>
             </form>
 
             <form class="panel form-stack" id="purchaseForm">
               <h3>Adicionar compra</h3>
-              <label>Usuario <select name="usuario_id" data-admin-users></select></label>
+              <label>Usuário <select name="usuario_id" data-admin-users></select></label>
               <label>Pacotes <input name="quantidade_pacotes" type="number" min="1" value="1" /></label>
               <button class="button primary" type="submit">Adicionar</button>
             </form>
 
             <form class="panel form-stack" id="editUserForm">
-              <h3>Editar informacoes</h3>
-              <label>Usuario <select name="usuario_id" data-admin-users></select></label>
+              <h3>Editar informações</h3>
+              <label>Usuário <select name="usuario_id" data-admin-users></select></label>
               <label>Nome <input name="nome" /></label>
               <label>Pacotes totais <input name="quantidade_pacotes" type="number" min="0" /></label>
               <label>Nova senha <input name="senha" placeholder="Opcional" /></label>
-              <label class="checkbox-line"><input name="ignorar_fluxo" type="checkbox" /> Nao contar no fluxo</label>
+              <label class="checkbox-line"><input name="ignorar_fluxo" type="checkbox" /> Não contar no fluxo</label>
               <button class="button primary" type="submit">Atualizar</button>
             </form>
           </div>
@@ -270,7 +270,7 @@
           <section class="panel">
             <div class="panel-heading">
               <h3>Confirmar animais</h3>
-              <label>Usuario <select id="animalUserSelect" data-admin-users></select></label>
+              <label>Usuário <select id="animalUserSelect" data-admin-users></select></label>
             </div>
             <div class="animal-admin-list" id="animalAdminList"></div>
             <button class="button primary" id="saveAnimalsButton">Atualizar progresso</button>
@@ -281,7 +281,7 @@
               <h3>Criar nova temporada</h3>
               <label>Nome <input name="nome" placeholder="Temporada 2" required /></label>
               <label>Imagem <input name="imagem" placeholder="/assets/temporada-2.png" /></label>
-              <label>Animais <textarea name="animais" rows="6" placeholder="001 Gato&#10;002 Dragao&#10;003 Robo"></textarea></label>
+              <label>Animais <textarea name="animais" rows="6" placeholder="001 Gato&#10;002 Dragão&#10;003 Robô"></textarea></label>
               <button class="button primary" type="submit">Criar temporada</button>
               <label>Temporada ativa <select id="activateSeasonSelect"></select></label>
               <button class="button ghost" id="activateSeasonButton">Ativar temporada</button>
@@ -290,22 +290,35 @@
             <article class="panel form-stack">
               <h3>Backup CSV</h3>
               <div class="button-row">
-                <button class="button ghost" data-export="usuarios">Usuarios</button>
-                <button class="button ghost" data-export="catalogos">Catalogos</button>
+                <button class="button ghost" data-export="usuarios">Usuários</button>
+                <button class="button ghost" data-export="catalogos">Catálogos</button>
                 <button class="button ghost" data-export="conquistas">Conquistas</button>
                 <button class="button ghost" data-export="animais">Animais</button>
                 <button class="button ghost" data-export="compras">Compras</button>
                 <button class="button ghost" data-export="eventos_site">Fluxo</button>
               </div>
-              <label>Importar catalogos <textarea id="catalogImport" rows="4" placeholder="codigo&#10;CAT-0100"></textarea></label>
-              <button class="button primary" id="importCatalogsButton">Importar catalogos</button>
-              <label>Importar usuarios <textarea id="userImport" rows="4" placeholder="nome,codigo_catalogo,senha,quantidade_pacotes"></textarea></label>
-              <button class="button primary" id="importUsersButton">Importar usuarios</button>
+              <label>Importar catálogos <textarea id="catalogImport" rows="4" placeholder="codigo&#10;CAT-0100"></textarea></label>
+              <button class="button primary" id="importCatalogsButton">Importar catálogos</button>
+              <label>Importar usuários <textarea id="userImport" rows="4" placeholder="nome,codigo_catalogo,senha,quantidade_pacotes"></textarea></label>
+              <button class="button primary" id="importUsersButton">Importar usuários</button>
             </article>
           </section>
         </div>
       </section>
     </main>
+
+    <dialog class="animal-detail-dialog" id="animalDetailDialog" aria-labelledby="animalDetailTitle">
+      <article class="animal-detail-card" id="animalDetailCard">
+        <button class="icon-button dialog-close" id="animalDetailClose" aria-label="Fechar detalhes" type="button">
+          &times;
+        </button>
+        <span class="animal-detail-kicker" id="animalDetailVariant">Normal</span>
+        <div class="animal-detail-figure" id="animalDetailFigure">◆</div>
+        <p class="animal-detail-number" id="animalDetailNumber">001</p>
+        <h3 id="animalDetailTitle">Animal</h3>
+        <p class="animal-detail-fact" id="animalDetailFact"></p>
+      </article>
+    </dialog>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script type="module" src="/js/app.js"></script>

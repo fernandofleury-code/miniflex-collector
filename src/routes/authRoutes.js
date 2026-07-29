@@ -72,7 +72,7 @@ authRoutes.post("/login", async (req, res) => {
   }
 
   if (!user || !verifyPassword(senha, user.senha)) {
-    res.status(401).json({ error: "Nome ou senha invalidos." });
+    res.status(401).json({ error: "Nome ou senha inválidos." });
     return;
   }
 

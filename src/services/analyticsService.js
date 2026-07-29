@@ -95,7 +95,7 @@ export function resolveTrafficRange({ range = "today", date = "" } = {}) {
       range,
       start: shiftDate(today, -6),
       end: today,
-      label: "Ultimos 7 dias",
+      label: "Últimos 7 dias",
     };
   }
 

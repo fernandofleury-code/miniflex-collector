@@ -31,6 +31,29 @@ const animalIcons = {
   tatu: "🛡️",
 };
 
+const animalFacts = {
+  tubarao:
+    "O tubarão é uma espécie mais antiga que as árvores e sobreviveu a uma extinção em massa ocorrida no passado.",
+  hipopotamo:
+    "Os hipopótamos estão entre as espécies mais mortais da África, sendo até mais fatais que leões e crocodilos.",
+  lontra:
+    "As lontras são muito inteligentes; para se alimentar de moluscos de casca dura, usam uma pedra para quebrar o casco.",
+  polvo:
+    "Os polvos têm cerca de 500 milhões de neurônios, permitindo que cada tentáculo aja com bastante independência; quando perdem um tentáculo, conseguem regenerá-lo.",
+  raposa:
+    "As raposas são da mesma família dos lobos e cachorros, têm audição super sensível e usam a cauda para equilíbrio e aquecimento do corpo.",
+  crocodilo:
+    "Os crocodilos têm a mordida mais forte do mundo animal; além disso, seus dentes são renovados ao longo da vida.",
+  caranguejo:
+    "Os caranguejos possuem 10 patas, conseguem regenerar membros perdidos e têm visão periférica, deixando só os olhos para fora quando se enterram.",
+  elefante:
+    "Os elefantes têm uma memória fantástica para reconhecer lugares e animais; como não têm proteção natural contra sol e insetos, cobrem-se de terra e areia.",
+  capivara:
+    "As capivaras são os maiores roedores do mundo e ótimas nadadoras, com olhos, ouvidos e narinas no alto da cabeça.",
+  tatu:
+    "O tatu é o único mamífero com carapaça; algumas espécies se enrolam como defesa, e sua visão é fraca por passar muito tempo no subsolo.",
+};
+
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
@@ -40,6 +63,7 @@ async function init() {
   bindNavigation();
   bindAuth();
   bindAdmin();
+  bindAnimalDetails();
   bindAutoRefresh();
 
   const session = await api("/api/auth/me");
@@ -68,6 +92,19 @@ function bindNavigation() {
   });
 }
 
+function bindAnimalDetails() {
+  $("#collectionGrid").addEventListener("click", (event) => {
+    const card = event.target.closest("[data-animal-card]");
+    if (!card) return;
+    openAnimalDetails(card);
+  });
+
+  $("#animalDetailClose").addEventListener("click", () => closeAnimalDetails());
+  $("#animalDetailDialog").addEventListener("click", (event) => {
+    if (event.target.id === "animalDetailDialog") closeAnimalDetails();
+  });
+}
+
 function bindAuth() {
   $("#registerForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -78,7 +115,7 @@ function bindAuth() {
       });
       state.user = response.user;
       renderSessionState();
-      toast("Conta criada. Boa colecao!");
+      toast("Conta criada. Boa coleção!");
       await loadDashboard();
       await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection()]);
     } catch (error) {
@@ -140,12 +177,12 @@ function bindAdmin() {
 
   $("#catalogForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    await adminAction("/api/admin/catalogs", formJson(event.currentTarget), "Codigos salvos.");
+    await adminAction("/api/admin/catalogs", formJson(event.currentTarget), "Códigos salvos.");
   });
 
   $("#manualUserForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    await adminAction("/api/admin/users", formJson(event.currentTarget), "Usuario criado.");
+    await adminAction("/api/admin/users", formJson(event.currentTarget), "Usuário criado.");
   });
 
   $("#purchaseForm").addEventListener("submit", async (event) => {
@@ -171,7 +208,7 @@ function bindAdmin() {
       ignorar_fluxo: event.currentTarget.ignorar_fluxo.checked,
     };
     if (data.senha) payload.senha = data.senha;
-    await adminAction(`/api/admin/users/${data.usuario_id}`, payload, "Usuario atualizado.", "PATCH");
+    await adminAction(`/api/admin/users/${data.usuario_id}`, payload, "Usuário atualizado.", "PATCH");
   });
 
   $("#animalUserSelect").addEventListener("change", () => loadAdminCollection());
@@ -214,7 +251,7 @@ function bindAdmin() {
     await adminAction(
       "/api/admin/import/catalogs",
       { csv: $("#catalogImport").value },
-      "Catalogos importados.",
+      "Catálogos importados.",
     );
   });
 
@@ -223,7 +260,7 @@ function bindAdmin() {
     await adminAction(
       "/api/admin/import/users",
       { csv: $("#userImport").value },
-      "Usuarios importados.",
+      "Usuários importados.",
     );
   });
 
@@ -242,7 +279,7 @@ function bindAdmin() {
     await adminAction(
       "/api/admin/ignore-current-visitor",
       {},
-      "Este dispositivo nao entra mais no fluxo.",
+      "Este dispositivo não entra mais no fluxo.",
     );
   });
 }
@@ -288,10 +325,10 @@ async function loadHome() {
     )
     .join("");
 
-  $("#firstCompleter").textContent = data.firstCompleter?.nome || "Ainda ninguem";
+  $("#firstCompleter").textContent = data.firstCompleter?.nome || "Ainda ninguém";
   $("#topBuyer").textContent = data.topBuyer
     ? `${data.topBuyer.nome} (${data.topBuyer.quantidade_pacotes})`
-    : "Ainda ninguem";
+    : "Ainda ninguém";
 }
 
 async function loadDashboard() {
@@ -328,7 +365,7 @@ async function logout() {
   renderSessionState();
   await loadDashboard();
   await loadCollection();
-  toast("Voce saiu da conta.");
+  toast("Você saiu da conta.");
 }
 
 function renderSessionState() {
@@ -364,8 +401,8 @@ function renderDashboard(data) {
   $("#packageCount").textContent = data.profile.quantidade_pacotes;
   $("#progressText").textContent = `${data.owned} / ${data.total} animais`;
   $("#statusText").textContent = data.profile.colecao_completa
-    ? "Colecao completa"
-    : "Colecao em andamento";
+    ? "Coleção completa"
+    : "Coleção em andamento";
   $("#progressFill").style.width = `${data.progress}%`;
   $("#achievementList").innerHTML = data.achievements.length
     ? data.achievements.map((item) => `<span class="badge">${item.nome_conquista}</span>`).join("")
@@ -402,7 +439,7 @@ async function loadRanking() {
             <td>${row.quantidade_pacotes}</td>
             <td>${row.gold}</td>
             <td>${row.bicolor}</td>
-            <td>${row.colecao_completa ? "Sim" : "Nao"}</td>
+            <td>${row.colecao_completa ? "Sim" : "Não"}</td>
           </tr>
         `,
         )
@@ -413,8 +450,8 @@ async function loadRanking() {
 async function loadHall() {
   const data = await api(`/api/public/hall?season_id=${state.selectedSeasonId}`);
   $("#hallGrid").innerHTML = [
-    hallFeature("🥇 Primeiro comprador", data.firstBuyer?.nome || "Ainda ninguem"),
-    hallFeature("🥇 Primeiro a completar", data.firstCompleter?.nome || "Ainda ninguem"),
+    hallFeature("🥇 Primeiro comprador", data.firstBuyer?.nome || "Ainda ninguém"),
+    hallFeature("🥇 Primeiro a completar", data.firstCompleter?.nome || "Ainda ninguém"),
     hallList("🏆 Top 10 compradores", data.topBuyers, "pacotes"),
     hallList("⭐ Top 10 Gold", data.topGold, "gold"),
     hallList("🎨 Top 10 Bicolor", data.topBicolor, "bicolor"),
@@ -481,13 +518,13 @@ function renderTraffic(traffic) {
   $("#trafficDate").disabled = state.trafficRange !== "date";
 
   $("#trafficSummary").innerHTML = [
-    ["ðŸ‘", "Visitas", traffic.summary.pageViews],
-    ["ðŸ‘¥", "Visitantes", traffic.summary.uniqueVisitors],
-    ["ðŸ”", "Logins", traffic.summary.logins],
-    ["âœ…", "Novas contas", traffic.summary.newAccounts],
-    ["ðŸ“¦", "Pacotes", traffic.summary.packages],
-    ["â­", "Gold", traffic.summary.goldRegistered],
-    ["ðŸŽ¨", "Bicolor", traffic.summary.bicolorRegistered],
+    ["👁", "Visitas", traffic.summary.pageViews],
+    ["👥", "Visitantes", traffic.summary.uniqueVisitors],
+    ["🔐", "Logins", traffic.summary.logins],
+    ["✅", "Novas contas", traffic.summary.newAccounts],
+    ["📦", "Pacotes", traffic.summary.packages],
+    ["⭐", "Gold", traffic.summary.goldRegistered],
+    ["🎨", "Bicolor", traffic.summary.bicolorRegistered],
   ]
     .map(
       ([icon, label, value]) => `
@@ -507,7 +544,7 @@ function renderTraffic(traffic) {
 
 async function loadAdminCollection() {
   if (!state.admin || !state.adminData?.users.length) {
-    $("#animalAdminList").innerHTML = "<p>Nenhum usuario nesta temporada.</p>";
+    $("#animalAdminList").innerHTML = "<p>Nenhum usuário nesta temporada.</p>";
     return;
   }
 
@@ -543,7 +580,7 @@ async function adminAction(path, body, message, method = "POST") {
 async function downloadCsv(entity) {
   try {
     const response = await fetch(`/api/admin/export/${entity}`);
-    if (!response.ok) throw new Error("Nao foi possivel exportar.");
+    if (!response.ok) throw new Error("Não foi possível exportar.");
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -579,32 +616,85 @@ function fillEditUserForm(userId) {
 }
 
 function animalCard(animal, owned) {
-  const key = animal.nome.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  const key = animalKey(animal.nome);
+  const variant = owned ? "normal" : "locked";
   return `
-    <article class="animal-card ${owned ? "" : "is-locked"}">
+    <button
+      class="animal-card ${owned ? "" : "is-locked"}"
+      type="button"
+      data-animal-card
+      data-variant="${variant}"
+      data-animal-key="${key}"
+      data-animal-number="${animal.numero}"
+      data-animal-name="${escapeHtml(animal.nome)}"
+    >
       <span class="animal-number">${animal.numero}</span>
       <div class="animal-figure">${animalIcons[key] || "◆"}</div>
       <h3>${escapeHtml(animal.nome)}</h3>
       <div class="badge-list">
         ${owned ? '<span class="badge">Normal</span>' : '<span class="badge">Cinza</span>'}
       </div>
-    </article>
+    </button>
   `;
 }
 
 function variantAnimalCard(animal, variant) {
-  const key = animal.nome.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  const key = animalKey(animal.nome);
   const label = variant === "gold" ? "Gold" : "Bicolor";
   return `
-    <article class="animal-card animal-variant is-${variant}">
+    <button
+      class="animal-card animal-variant is-${variant}"
+      type="button"
+      data-animal-card
+      data-variant="${variant}"
+      data-animal-key="${key}"
+      data-animal-number="${animal.numero}"
+      data-animal-name="${escapeHtml(animal.nome)}"
+    >
       <span class="animal-number">${animal.numero}</span>
       <div class="animal-figure">${animalIcons[key] || "◆"}</div>
       <h3>${escapeHtml(animal.nome)}</h3>
       <div class="badge-list">
         <span class="badge">${label}</span>
       </div>
-    </article>
+    </button>
   `;
+}
+
+function openAnimalDetails(card) {
+  const variant = card.dataset.variant || "normal";
+  const key = card.dataset.animalKey || "";
+  const variantLabels = {
+    normal: "Normal",
+    locked: "Ainda cinza",
+    gold: "Gold",
+    bicolor: "Bicolor",
+  };
+  const detailCard = $("#animalDetailCard");
+  detailCard.className = `animal-detail-card is-${variant}`;
+
+  $("#animalDetailVariant").textContent = variantLabels[variant] || "Normal";
+  $("#animalDetailFigure").textContent = animalIcons[key] || "◆";
+  $("#animalDetailNumber").textContent = card.dataset.animalNumber || "";
+  $("#animalDetailTitle").textContent = card.dataset.animalName || "Animal";
+  $("#animalDetailFact").textContent = animalFacts[key] || "Curiosidade em breve.";
+
+  const dialog = $("#animalDetailDialog");
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeAnimalDetails() {
+  const dialog = $("#animalDetailDialog");
+  if (typeof dialog.close === "function") dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function animalKey(name) {
+  return String(name || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "");
 }
 
 function hallFeature(title, value) {
@@ -703,7 +793,7 @@ async function api(path, options = {}) {
   const text = await response.text();
   const data = text ? JSON.parse(text) : {};
 
-  if (!response.ok) throw new Error(data.error || "Nao foi possivel concluir a acao.");
+  if (!response.ok) throw new Error(data.error || "Não foi possível concluir a ação.");
   return data;
 }
 
