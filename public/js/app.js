@@ -72,8 +72,9 @@ async function init() {
   renderSessionState();
 
   await loadSeasons();
+  if (state.user) await loadDashboard();
   await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection()]);
-  await loadDashboard();
+  if (!state.user) await loadDashboard();
   if (state.admin) await loadAdmin();
   trackPageView(state.view);
 }
@@ -411,10 +412,17 @@ function renderDashboard(data) {
 
 async function loadCollection() {
   const data = await api(`/api/public/collection?season_id=${state.selectedSeasonId}`);
-  const userAnimals =
-    state.dashboard?.profile?.temporada_id === state.selectedSeasonId
-      ? new Map(state.dashboard.animals.map((animal) => [animal.id, animal]))
-      : new Map();
+  const hasSeasonDashboard = state.dashboard?.profile?.temporada_id === state.selectedSeasonId;
+  const userAnimals = hasSeasonDashboard
+    ? new Map(state.dashboard.animals.map((animal) => [animal.id, animal]))
+    : new Map();
+
+  renderCollectionProgress({
+    owned: hasSeasonDashboard ? state.dashboard.owned : 0,
+    total: hasSeasonDashboard ? state.dashboard.total : data.animals.length,
+    progress: hasSeasonDashboard ? state.dashboard.progress : 0,
+    hasProgress: hasSeasonDashboard,
+  });
 
   $("#collectionGrid").innerHTML = data.animals
     .flatMap((animal) => {
@@ -425,6 +433,16 @@ async function loadCollection() {
       return cards;
     })
     .join("");
+}
+
+function renderCollectionProgress({ owned, total, progress, hasProgress }) {
+  $("#collectionProgressText").textContent = `${owned} / ${total} animais`;
+  $("#collectionProgressStatus").textContent = hasProgress
+    ? progress >= 100
+      ? "Coleção completa"
+      : "Coleção em andamento"
+    : "Entre para acompanhar sua coleção";
+  $("#collectionProgressFill").style.width = `${Math.max(0, Math.min(100, Number(progress) || 0))}%`;
 }
 
 async function loadRanking() {
@@ -632,7 +650,7 @@ function animalCard(animal, owned) {
       <div class="animal-figure">${animalIcons[key] || "◆"}</div>
       <h3>${escapeHtml(animal.nome)}</h3>
       <div class="badge-list">
-        ${owned ? '<span class="badge">Normal</span>' : '<span class="badge">Cinza</span>'}
+        ${owned ? '<span class="badge">Normal</span>' : '<span class="badge">Não possuído</span>'}
       </div>
     </button>
   `;
@@ -666,7 +684,7 @@ function openAnimalDetails(card) {
   const key = card.dataset.animalKey || "";
   const variantLabels = {
     normal: "Normal",
-    locked: "Ainda cinza",
+    locked: "Não possuído",
     gold: "Gold",
     bicolor: "Bicolor",
   };

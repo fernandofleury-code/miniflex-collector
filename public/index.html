@@ -127,6 +127,15 @@
         <div class="season-filter">
           <label>Temporada <select id="publicSeasonSelect"></select></label>
         </div>
+        <article class="collection-progress panel">
+          <div class="progress-label">
+            <strong id="collectionProgressText">0 / 10 animais</strong>
+            <span id="collectionProgressStatus">Entre para acompanhar sua coleção</span>
+          </div>
+          <div class="progress-bar" aria-label="Barra de progresso da coleção">
+            <span id="collectionProgressFill"></span>
+          </div>
+        </article>
         <div class="animal-grid" id="collectionGrid"></div>
       </section>
 
@@ -306,6 +315,14 @@
         </div>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>MiniFlex Collector</strong>
+        <p>Colecione. Troque. Complete.</p>
+      </div>
+      <span>Temporadas, rankings e conquistas em um só lugar.</span>
+    </footer>
 
     <dialog class="animal-detail-dialog" id="animalDetailDialog" aria-labelledby="animalDetailTitle">
       <article class="animal-detail-card" id="animalDetailCard">
