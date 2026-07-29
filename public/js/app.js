@@ -73,7 +73,7 @@ async function init() {
 
   await loadSeasons();
   if (state.user) await loadDashboard();
-  await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection()]);
+  await Promise.all([loadHome(), loadHall(), loadCollection()]);
   if (!state.user) await loadDashboard();
   if (state.admin) await loadAdmin();
   trackPageView(state.view);
@@ -89,7 +89,7 @@ function bindNavigation() {
 
   $("#publicSeasonSelect").addEventListener("change", async (event) => {
     state.selectedSeasonId = Number(event.target.value);
-    await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection()]);
+    await Promise.all([loadHome(), loadHall(), loadCollection()]);
   });
 }
 
@@ -118,7 +118,7 @@ function bindAuth() {
       renderSessionState();
       toast("Conta criada. Boa coleção!");
       await loadDashboard();
-      await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection()]);
+      await Promise.all([loadHome(), loadHall(), loadCollection()]);
     } catch (error) {
       toast(error.message, true);
     }
@@ -224,7 +224,7 @@ function bindAdmin() {
     }));
     await adminAction(`/api/admin/users/${userId}/animals`, { animals }, "Progresso atualizado.");
     await loadAdminCollection();
-    await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection(), loadDashboard()]);
+    await Promise.all([loadHome(), loadHall(), loadCollection(), loadDashboard()]);
   });
 
   $("#seasonForm").addEventListener("submit", async (event) => {
@@ -445,26 +445,6 @@ function renderCollectionProgress({ owned, total, progress, hasProgress }) {
   $("#collectionProgressFill").style.width = `${Math.max(0, Math.min(100, Number(progress) || 0))}%`;
 }
 
-async function loadRanking() {
-  const data = await api(`/api/public/ranking?season_id=${state.selectedSeasonId}`);
-  $("#rankingBody").innerHTML = data.ranking.length
-    ? data.ranking
-        .map(
-          (row) => `
-          <tr>
-            <td>${medal(row.posicao)} ${row.posicao}</td>
-            <td>${escapeHtml(row.nome)}</td>
-            <td>${row.quantidade_pacotes}</td>
-            <td>${row.gold}</td>
-            <td>${row.bicolor}</td>
-            <td>${row.colecao_completa ? "Sim" : "Não"}</td>
-          </tr>
-        `,
-        )
-        .join("")
-    : `<tr><td colspan="6">Nenhum colecionador cadastrado ainda.</td></tr>`;
-}
-
 async function loadHall() {
   const data = await api(`/api/public/hall?season_id=${state.selectedSeasonId}`);
   $("#hallGrid").innerHTML = [
@@ -589,7 +569,7 @@ async function adminAction(path, body, message, method = "POST") {
     await api(path, { method, body });
     toast(message);
     await loadAdmin();
-    await Promise.all([loadHome(), loadRanking(), loadHall(), loadCollection()]);
+    await Promise.all([loadHome(), loadHall(), loadCollection()]);
   } catch (error) {
     toast(error.message, true);
   }
