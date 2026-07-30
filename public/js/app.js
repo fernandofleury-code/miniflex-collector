@@ -460,11 +460,11 @@ function renderCollectionProgress({ owned, total, progress, hasProgress }) {
 async function loadHall() {
   const data = await api(`/api/public/hall?season_id=${state.selectedSeasonId}`);
   $("#hallGrid").innerHTML = [
-    hallFeature("🥇 Primeiro comprador", data.firstBuyer?.nome || "Ainda ninguém"),
-    hallFeature("🥇 Primeiro a completar", data.firstCompleter?.nome || "Ainda ninguém"),
-    hallList("🏆 Top 10 compradores", data.topBuyers, "pacotes"),
-    hallList("⭐ Top 10 Gold", data.topGold, "gold"),
-    hallList("🎨 Top 10 Bicolor", data.topBicolor, "bicolor"),
+    hallFeature("🥇", "Primeiro comprador", data.firstBuyer?.nome || "Ainda ninguém", "Abriu a temporada"),
+    hallFeature("👑", "Primeiro a completar", data.firstCompleter?.nome || "Ainda ninguém", "Completou os 10 animais"),
+    hallRanking("🏆", "Top 10 compradores", data.topBuyers, "is-wide"),
+    hallRanking("⭐", "Top 10 Gold", data.topGold),
+    hallRanking("🎨", "Top 10 Bicolor", data.topBicolor),
   ].join("");
 }
 
@@ -720,27 +720,59 @@ function animalVisualMarkup(key, name) {
   `;
 }
 
-function hallFeature(title, value) {
+function hallFeature(icon, title, value, subtitle) {
   return `
-    <article class="hall-card">
-      <h3>${title}</h3>
-      <strong>${escapeHtml(value)}</strong>
+    <article class="hall-card hall-feature">
+      <span class="hall-feature-icon">${icon}</span>
+      <div>
+        <p>${escapeHtml(subtitle)}</p>
+        <h3>${escapeHtml(title)}</h3>
+        <strong>${escapeHtml(value)}</strong>
+      </div>
     </article>
   `;
 }
 
-function hallList(title, rows, field) {
+function hallRanking(icon, title, rows, extraClass = "") {
   return `
-    <article class="hall-card">
-      <h3>${title}</h3>
+    <article class="hall-card hall-ranking ${extraClass}">
+      <div class="hall-ranking-heading">
+        <span>${icon}</span>
+        <h3>${escapeHtml(title)}</h3>
+      </div>
       ${
         rows.length
-          ? `<ol>${rows
-              .map((row) => `<li>${medal(row.posicao)} ${escapeHtml(row.nome)} - ${row[field]}</li>`)
-              .join("")}</ol>`
-          : "<p>Aguardando registros.</p>"
+          ? `
+            <table class="hall-ranking-table">
+              <thead>
+                <tr>
+                  <th>Pos.</th>
+                  <th>Colecionador</th>
+                  <th>Pacotes</th>
+                  <th>Gold</th>
+                  <th>Bicolor</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map((row) => hallRankingRow(row)).join("")}
+              </tbody>
+            </table>
+          `
+          : `<div class="empty-ranking">Aguardando registros.</div>`
       }
     </article>
+  `;
+}
+
+function hallRankingRow(row) {
+  return `
+    <tr>
+      <td><span class="rank-position">${medal(row.posicao)} ${row.posicao}</span></td>
+      <td class="rank-name">${escapeHtml(row.nome)}</td>
+      <td class="rank-score">${row.pacotes}</td>
+      <td class="rank-score">${row.gold}</td>
+      <td class="rank-score">${row.bicolor}</td>
+    </tr>
   `;
 }
 
