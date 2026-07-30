@@ -229,6 +229,20 @@ async function migrate(db) {
       FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
     );
 
+    CREATE TABLE IF NOT EXISTS presentes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      animal TEXT NOT NULL,
+      destinatario TEXT NOT NULL,
+      turma TEXT NOT NULL,
+      mensagem TEXT,
+      surpresa INTEGER NOT NULL DEFAULT 0,
+      usuario_id INTEGER,
+      visitor_id TEXT,
+      status TEXT NOT NULL DEFAULT 'solicitado',
+      data TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+    );
+
     CREATE INDEX IF NOT EXISTS usuarios_temporada_idx ON usuarios (temporada_id);
     CREATE INDEX IF NOT EXISTS catalogos_temporada_idx ON catalogos (temporada_id);
     CREATE INDEX IF NOT EXISTS conquistas_usuario_idx ON conquistas (usuario_id);
@@ -238,6 +252,8 @@ async function migrate(db) {
     CREATE INDEX IF NOT EXISTS eventos_site_tipo_idx ON eventos_site (tipo);
     CREATE INDEX IF NOT EXISTS eventos_site_visitor_idx ON eventos_site (visitor_id);
     CREATE INDEX IF NOT EXISTS visitantes_ignorados_usuario_idx ON visitantes_ignorados (usuario_id);
+    CREATE INDEX IF NOT EXISTS presentes_data_idx ON presentes (data);
+    CREATE INDEX IF NOT EXISTS presentes_usuario_idx ON presentes (usuario_id);
   `);
 
   await addColumnIfMissing(db, "usuarios", "ignorar_fluxo", "ignorar_fluxo INTEGER NOT NULL DEFAULT 0");

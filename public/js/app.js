@@ -7,6 +7,7 @@ const state = {
   dashboard: null,
   adminData: null,
   adminCollection: null,
+  giftAnimals: [],
   refreshTimer: null,
   isRefreshingCollector: false,
   trafficRange: "today",
@@ -77,6 +78,8 @@ async function init() {
   bindAdmin();
   bindAnimalDetails();
   bindAutoRefresh();
+  bindGift();
+  bindRevealAnimations();
 
   const session = await api("/api/auth/me");
   state.user = session.user;
@@ -116,6 +119,60 @@ function bindAnimalDetails() {
   $("#animalDetailDialog").addEventListener("click", (event) => {
     if (event.target.id === "animalDetailDialog") closeAnimalDetails();
   });
+}
+
+function bindGift() {
+  const form = $("#giftForm");
+  if (!form) return;
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-gift-scroll]");
+    if (!button) return;
+    event.preventDefault();
+    form.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const payload = formJson(form);
+    payload.surpresa = form.querySelector("[name='surpresa']").checked;
+
+    try {
+      await api("/api/public/gifts", {
+        method: "POST",
+        body: payload,
+      });
+      form.reset();
+      toast("Pedido de presente enviado.");
+    } catch (error) {
+      toast(error.message, true);
+    }
+  });
+}
+
+function bindRevealAnimations() {
+  const elements = $$(".reveal-on-scroll");
+  if (!elements.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    elements.forEach((element) => element.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.16 },
+  );
+
+  elements.forEach((element) => observer.observe(element));
+  window.requestAnimationFrame(refreshRevealAnimations);
 }
 
 function bindAuth() {
@@ -302,9 +359,17 @@ function showView(view) {
   $$(".view").forEach((section) => section.classList.toggle("is-visible", section.id === `view-${view}`));
   $$(".nav-link").forEach((link) => link.classList.toggle("is-active", link.dataset.viewLink === view));
   trackPageView(view);
+  window.requestAnimationFrame(refreshRevealAnimations);
 
   if (view === "dashboard") loadDashboard();
   if (view === "admin" && state.admin) loadAdmin();
+}
+
+function refreshRevealAnimations() {
+  $$(".view.is-visible .reveal-on-scroll").forEach((element) => {
+    const rect = element.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 40) element.classList.add("is-visible");
+  });
 }
 
 async function loadSeasons() {
@@ -424,6 +489,8 @@ function renderDashboard(data) {
 
 async function loadCollection() {
   const data = await api(`/api/public/collection?season_id=${state.selectedSeasonId}`);
+  state.giftAnimals = data.animals;
+  renderGiftAnimalOptions(data.animals);
   const hasSeasonDashboard = state.dashboard?.profile?.temporada_id === state.selectedSeasonId;
   const userAnimals = hasSeasonDashboard
     ? new Map(state.dashboard.animals.map((animal) => [animal.id, animal]))
@@ -445,6 +512,21 @@ async function loadCollection() {
       return cards;
     })
     .join("");
+}
+
+function renderGiftAnimalOptions(animals = state.giftAnimals) {
+  const select = $("#giftAnimalSelect");
+  if (!select) return;
+
+  const currentValue = select.value;
+  select.innerHTML = [
+    '<option value="">Escolha um animal</option>',
+    ...animals.map((animal) => {
+      const label = `${animal.numero} ${animal.nome}`;
+      return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
+    }),
+  ].join("");
+  if (currentValue) select.value = currentValue;
 }
 
 function renderCollectionProgress({ owned, total, progress, hasProgress }) {
@@ -517,6 +599,7 @@ function renderAdmin(data) {
   drawRarityChart("rarityChart", data.charts.rarity);
   drawBarChart("buyersChart", data.charts.buyers, "#0aa6c2");
   renderTraffic(data.traffic);
+  renderGiftRequests(data.giftRequests || []);
 }
 
 function renderTraffic(traffic) {
@@ -550,6 +633,34 @@ function renderTraffic(traffic) {
     traffic.daily.map((row) => ({ label: row.label, value: row.page_views })),
     "#1168d8",
   );
+}
+
+function renderGiftRequests(requests) {
+  const list = $("#giftRequestList");
+  if (!list) return;
+
+  if (!requests.length) {
+    list.innerHTML = `<div class="empty-ranking">Nenhum pedido de presente ainda.</div>`;
+    return;
+  }
+
+  list.innerHTML = requests
+    .map(
+      (request) => `
+        <article class="gift-admin-item">
+          <div>
+            <strong>${escapeHtml(request.destinatario)}</strong>
+            <p>${escapeHtml(request.animal)} • ${escapeHtml(request.turma)}</p>
+            ${request.mensagem ? `<small>${escapeHtml(request.mensagem)}</small>` : ""}
+          </div>
+          <div class="gift-admin-meta">
+            <span class="badge">${request.surpresa ? "Surpresa" : "Entrega normal"}</span>
+            <small>${formatDateTime(request.data)}</small>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
 }
 
 async function loadAdminCollection() {
@@ -875,6 +986,18 @@ function getVisitorId() {
 
 function medal(position) {
   return position === 1 ? "🥇" : position === 2 ? "🥈" : position === 3 ? "🥉" : "🏅";
+}
+
+function formatDateTime(value) {
+  if (!value) return "";
+  const date = new Date(`${value}Z`);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function initials(name = "MF") {

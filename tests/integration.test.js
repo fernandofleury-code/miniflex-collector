@@ -42,6 +42,19 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(dashboard.data.owned, 0);
     assert.equal(dashboard.data.achievements.length, 0);
 
+    const giftRequest = await jsonFetch(`${baseUrl}/api/public/gifts`, {
+      method: "POST",
+      visitorId,
+      body: {
+        animal: "001 Tubarão",
+        destinatario: "Colega Teste",
+        turma: "6A",
+        mensagem: "Surpresa MiniFlex",
+        surpresa: true,
+      },
+    });
+    assert.equal(giftRequest.data.ok, true);
+
     const emptyRanking = await jsonFetch(`${baseUrl}/api/public/ranking`);
     assert.equal(emptyRanking.data.ranking.length, 0);
 
@@ -80,6 +93,8 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(overview.data.traffic.summary.uniqueVisitors, 1);
     assert.equal(overview.data.traffic.summary.newAccounts, 1);
     assert.equal(overview.data.traffic.summary.logins, 1);
+    assert.equal(overview.data.giftRequests.length, 1);
+    assert.equal(overview.data.giftRequests[0].destinatario, "Colega Teste");
 
     const adminDeviceId = "admin-device-test";
     await jsonFetch(`${baseUrl}/api/public/track`, {

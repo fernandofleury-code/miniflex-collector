@@ -22,6 +22,7 @@
         <button class="nav-link" data-view-link="collection">Coleção</button>
         <button class="nav-link" data-view-link="hall">Hall da Fama⭐</button>
         <button class="nav-link" data-view-link="store">Loja</button>
+        <button class="nav-link gift-nav" data-view-link="gift">Presenteie❤️</button>
         <button class="nav-link" data-view-link="dashboard">Minha área</button>
         <button class="nav-link nav-admin" data-view-link="admin">Admin</button>
         <button class="nav-link nav-logout hidden" data-logout type="button">Sair</button>
@@ -180,6 +181,107 @@
         </div>
       </section>
 
+      <section class="view gift-page" id="view-gift">
+        <section class="gift-hero reveal-on-scroll">
+          <span class="gift-heart heart-one">❤️</span>
+          <span class="gift-heart heart-two">♡</span>
+          <span class="gift-heart heart-three">♥</span>
+          <div class="gift-hero-copy">
+            <p class="eyebrow">Edição exclusiva</p>
+            <h2>Presenteie Alguém Especial❤️</h2>
+            <p>Surpreenda alguém da escola com uma edição exclusiva do Mini Flex.</p>
+            <button class="button gift-primary" data-gift-scroll type="button">🎁 Escolher um Presente</button>
+          </div>
+          <div class="gift-visual" aria-hidden="true">
+            <span class="gift-glow"></span>
+            <img src="/assets/animals/tubarao.webp" alt="" />
+            <span class="gift-held-heart">❤️</span>
+          </div>
+        </section>
+
+        <section class="gift-layout reveal-on-scroll">
+          <article class="gift-exclusive-card panel">
+            <div class="gift-card-heading">
+              <span class="gift-icon">❤️</span>
+              <span class="gift-badge">EXCLUSIVO</span>
+            </div>
+            <h3>Edição Presente</h3>
+            <p>
+              Disponível apenas para presentes, esta versão especial do Mini Flex é produzida
+              exclusivamente na cor vermelha e não faz parte da coleção tradicional.
+            </p>
+          </article>
+
+          <div class="gift-delivery-mini panel">
+            <span>🎁</span>
+            <strong>Mini Flex vermelho</strong>
+            <p>Edição separada da temporada, feita para surpreender.</p>
+          </div>
+        </section>
+
+        <section class="gift-section reveal-on-scroll">
+          <div class="section-heading compact-heading">
+            <p class="eyebrow">Como funciona</p>
+            <h2>Um presente simples de pedir</h2>
+          </div>
+          <div class="gift-steps">
+            <article class="gift-step-card">
+              <span class="step-number">1</span>
+              <span class="step-icon">🐾</span>
+              <p>Escolha o animal favorito.</p>
+            </article>
+            <article class="gift-step-card">
+              <span class="step-number">2</span>
+              <span class="step-icon">🏷️</span>
+              <p>Informe o nome da pessoa que receberá o presente.</p>
+            </article>
+            <article class="gift-step-card">
+              <span class="step-number">3</span>
+              <span class="step-icon">💌</span>
+              <p>Escreva uma mensagem opcional.</p>
+            </article>
+            <article class="gift-step-card">
+              <span class="step-number">4</span>
+              <span class="step-icon">🎒</span>
+              <p>Eu realizarei a entrega pessoalmente na escola.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="gift-request-grid reveal-on-scroll">
+          <form class="panel gift-form form-stack" id="giftForm">
+            <div class="gift-form-heading">
+              <span>❤️</span>
+              <div>
+                <p class="eyebrow">Pedido</p>
+                <h3>Solicitar presente</h3>
+              </div>
+            </div>
+            <label>Animal escolhido <select id="giftAnimalSelect" name="animal" required></select></label>
+            <label>Nome do destinatário <input name="destinatario" autocomplete="off" required /></label>
+            <label>Turma <input name="turma" autocomplete="off" required /></label>
+            <label>Mensagem (opcional) <textarea name="mensagem" rows="4" maxlength="240"></textarea></label>
+            <label class="checkbox-line gift-checkbox">
+              <input name="surpresa" type="checkbox" /> Entregar como surpresa
+            </label>
+            <button class="button gift-submit" type="submit">❤️ Solicitar Presente</button>
+          </form>
+
+          <article class="panel gift-delivery-card">
+            <div class="delivery-icon">📦</div>
+            <p class="eyebrow">Entrega</p>
+            <h3>📦 Entrega</h3>
+            <p>
+              A entrega será realizada pessoalmente por mim dentro da escola.
+            </p>
+            <p>
+              Para garantir uma boa experiência, as entregas acontecem durante o período escolar,
+              conforme minha disponibilidade e os horários permitidos pela escola.
+            </p>
+          </article>
+        </section>
+      </section>
+
       <section class="view" id="view-admin">
         <div class="section-heading">
           <p class="eyebrow">Administração</p>
@@ -214,6 +316,14 @@
             </div>
             <div class="admin-summary traffic-summary" id="trafficSummary"></div>
             <canvas id="trafficChart" width="920" height="230"></canvas>
+          </section>
+
+          <section class="panel gift-admin-panel">
+            <div class="panel-heading">
+              <h3>Pedidos de presente</h3>
+              <button class="button ghost" data-export="presentes" type="button">Exportar CSV</button>
+            </div>
+            <div class="gift-admin-list" id="giftRequestList"></div>
           </section>
 
           <div class="chart-grid">

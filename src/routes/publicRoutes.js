@@ -103,6 +103,40 @@ publicRoutes.post("/track", async (req, res) => {
   res.json({ ok: true });
 });
 
+publicRoutes.post("/gifts", async (req, res) => {
+  const db = await getDb();
+  const visitorId = visitorIdFromRequest(req);
+  const animal = cleanGiftText(req.body.animal, 80);
+  const destinatario = cleanGiftText(req.body.destinatario, 90);
+  const turma = cleanGiftText(req.body.turma, 40);
+  const mensagem = cleanGiftText(req.body.mensagem, 240);
+  const surpresa = req.body.surpresa === true || req.body.surpresa === "on" || req.body.surpresa === "true";
+
+  if (!animal || !destinatario || !turma) {
+    res.status(400).json({ error: "Preencha animal, destinatário e turma." });
+    return;
+  }
+
+  await db
+    .prepare(
+      `
+      INSERT INTO presentes (animal, destinatario, turma, mensagem, surpresa, usuario_id, visitor_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+      `,
+    )
+    .run(animal, destinatario, turma, mensagem || null, surpresa ? 1 : 0, req.user?.id || null, visitorId || null);
+
+  await trackEvent(db, {
+    tipo: "gift_request",
+    visitorId,
+    userId: req.user?.id,
+    rota: "gift",
+    detalhes: { animal, turma, surpresa },
+  });
+
+  res.status(201).json({ ok: true });
+});
+
 publicRoutes.get("/collection", async (req, res) => {
   const db = await getDb();
   const activeSeason = await getActiveSeason(db);
@@ -213,4 +247,11 @@ async function topList(db, seasonId, orderField, valueName) {
       gold: row.gold,
       bicolor: row.bicolor,
     }));
+}
+
+function cleanGiftText(value, maxLength) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
 }

@@ -76,6 +76,28 @@ adminRoutes.get("/overview", async (req, res) => {
     .all(seasonId))
     .map((catalog) => ({ ...catalog, utilizado: Boolean(catalog.utilizado) }));
 
+  const giftRequests = (await db
+    .prepare(
+      `
+      SELECT
+        p.id,
+        p.animal,
+        p.destinatario,
+        p.turma,
+        p.mensagem,
+        p.surpresa,
+        p.status,
+        p.data,
+        u.nome AS solicitante
+      FROM presentes p
+      LEFT JOIN usuarios u ON u.id = p.usuario_id
+      ORDER BY p.data DESC, p.id DESC
+      LIMIT 25
+      `,
+    )
+    .all())
+    .map((gift) => ({ ...gift, surpresa: Boolean(gift.surpresa) }));
+
   const peopleTotals = await db
     .prepare(
       `
@@ -108,6 +130,7 @@ adminRoutes.get("/overview", async (req, res) => {
     animals,
     users,
     catalogs,
+    giftRequests,
     totals,
     charts: await getChartData(db, seasonId),
     traffic: await getTrafficData(db, seasonId, {
@@ -371,6 +394,7 @@ adminRoutes.get("/export/:entity", async (req, res) => {
     animais: "SELECT id, temporada_id, numero, nome FROM animais ORDER BY temporada_id, numero",
     compras: "SELECT id, usuario_id, quantidade_pacotes, data FROM compras ORDER BY id",
     eventos_site: "SELECT id, tipo, visitor_id, usuario_id, rota, detalhes, data FROM eventos_site ORDER BY id",
+    presentes: "SELECT id, animal, destinatario, turma, mensagem, surpresa, usuario_id, visitor_id, status, data FROM presentes ORDER BY id",
   };
 
   if (!allowed[entity]) {
