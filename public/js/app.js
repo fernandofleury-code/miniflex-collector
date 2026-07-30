@@ -642,7 +642,7 @@ function animalCard(animal, owned) {
       <div class="animal-figure">${animalVisualMarkup(key, animal.nome)}</div>
       <h3>${escapeHtml(animal.nome)}</h3>
       <div class="badge-list">
-        ${owned ? '<span class="badge">Normal</span>' : '<span class="badge">Não possuído</span>'}
+        ${owned ? '<span class="badge">Normal</span>' : '<span class="badge ownership-badge is-missing">Não possuído</span>'}
       </div>
     </button>
   `;
