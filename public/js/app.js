@@ -79,6 +79,7 @@ async function init() {
   bindAnimalDetails();
   bindAutoRefresh();
   bindGift();
+  bindNormalOrder();
   bindRevealAnimations();
 
   const session = await api("/api/auth/me");
@@ -151,6 +152,36 @@ function bindGift() {
       });
       form.reset();
       toast("Pedido de presente enviado.");
+    } catch (error) {
+      toast(error.message, true);
+    }
+  });
+}
+
+function bindNormalOrder() {
+  const form = $("#normalOrderForm");
+  if (!form) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!state.user) {
+      toast("Entre com sua conta para solicitar a compra.", true);
+      showView("dashboard");
+      return;
+    }
+
+    const payload = formJson(form);
+    payload.quantidade = Number(payload.quantidade) || 1;
+
+    try {
+      await api("/api/public/normal-orders", {
+        method: "POST",
+        body: payload,
+      });
+      form.reset();
+      form.querySelector("[name='quantidade']").value = "1";
+      toast("Pedido da versão normal enviado.");
     } catch (error) {
       toast(error.message, true);
     }
@@ -331,6 +362,19 @@ function bindAdmin() {
     await adminAction(`/api/admin/gifts/${deleteGiftButton.dataset.deleteGift}`, {}, "Pedido excluído.", "DELETE");
   });
 
+  document.addEventListener("click", async (event) => {
+    const deleteOrderButton = event.target.closest("[data-delete-normal-order]");
+    if (!deleteOrderButton) return;
+    event.preventDefault();
+    if (!window.confirm("Excluir este pedido da versão normal?")) return;
+    await adminAction(
+      `/api/admin/normal-orders/${deleteOrderButton.dataset.deleteNormalOrder}`,
+      {},
+      "Pedido excluído.",
+      "DELETE",
+    );
+  });
+
   $("#importCatalogsButton").addEventListener("click", async (event) => {
     event.preventDefault();
     await adminAction(
@@ -466,6 +510,7 @@ function renderSessionState() {
     button.classList.toggle("hidden", !state.user && !state.admin);
   });
   renderGiftLoginState();
+  renderNormalOrderLoginState();
 
   if (state.user && !state.refreshTimer) {
     state.refreshTimer = window.setInterval(refreshCollectorData, AUTO_REFRESH_MS);
@@ -484,6 +529,15 @@ function renderGiftLoginState() {
 
   note.classList.toggle("hidden", Boolean(state.user));
   submit.textContent = state.user ? "❤️ Solicitar Presente" : "Entrar para Solicitar";
+}
+
+function renderNormalOrderLoginState() {
+  const note = $("#normalOrderLoginNote");
+  const submit = $("#normalOrderForm .normal-order-submit");
+  if (!note || !submit) return;
+
+  note.classList.toggle("hidden", Boolean(state.user));
+  submit.textContent = state.user ? "📦 Solicitar Compra" : "Entrar para Comprar";
 }
 
 async function refreshCollectorData() {
@@ -540,18 +594,20 @@ async function loadCollection() {
 }
 
 function renderGiftAnimalOptions(animals = state.giftAnimals) {
-  const select = $("#giftAnimalSelect");
-  if (!select) return;
+  ["#giftAnimalSelect", "#normalOrderAnimalSelect"].forEach((selector) => {
+    const select = $(selector);
+    if (!select) return;
 
-  const currentValue = select.value;
-  select.innerHTML = [
-    '<option value="">Escolha um animal</option>',
-    ...animals.map((animal) => {
-      const label = `${animal.numero} ${animal.nome}`;
-      return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
-    }),
-  ].join("");
-  if (currentValue) select.value = currentValue;
+    const currentValue = select.value;
+    select.innerHTML = [
+      '<option value="">Escolha um animal</option>',
+      ...animals.map((animal) => {
+        const label = `${animal.numero} ${animal.nome}`;
+        return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
+      }),
+    ].join("");
+    if (currentValue) select.value = currentValue;
+  });
 }
 
 function renderCollectionProgress({ owned, total, progress, hasProgress }) {
@@ -625,6 +681,7 @@ function renderAdmin(data) {
   drawBarChart("buyersChart", data.charts.buyers, "#0aa6c2");
   renderTraffic(data.traffic);
   renderGiftRequests(data.giftRequests || []);
+  renderNormalOrders(data.normalOrders || []);
 }
 
 function renderTraffic(traffic) {
@@ -685,6 +742,42 @@ function renderGiftRequests(requests) {
               class="icon-button gift-delete-button"
               data-delete-gift="${request.id}"
               aria-label="Excluir pedido de presente"
+              type="button"
+            >
+              ×
+            </button>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
+}
+
+function renderNormalOrders(orders) {
+  const list = $("#normalOrderList");
+  if (!list) return;
+
+  if (!orders.length) {
+    list.innerHTML = `<div class="empty-ranking">Nenhum pedido da versão normal ainda.</div>`;
+    return;
+  }
+
+  list.innerHTML = orders
+    .map(
+      (order) => `
+        <article class="normal-order-admin-item">
+          <div>
+            <strong>${escapeHtml(order.solicitante || "Colecionador")}</strong>
+            <p>${escapeHtml(order.animal)} • ${order.quantidade} unidade(s) • ${escapeHtml(order.turma)}</p>
+            ${order.observacao ? `<small>${escapeHtml(order.observacao)}</small>` : ""}
+          </div>
+          <div class="gift-admin-meta">
+            <span class="badge">Normal</span>
+            <small>${formatDateTime(order.data)}</small>
+            <button
+              class="icon-button gift-delete-button"
+              data-delete-normal-order="${order.id}"
+              aria-label="Excluir pedido da versão normal"
               type="button"
             >
               ×

@@ -107,10 +107,10 @@ publicRoutes.post("/track", async (req, res) => {
 publicRoutes.post("/gifts", requireUser, async (req, res) => {
   const db = await getDb();
   const visitorId = visitorIdFromRequest(req);
-  const animal = cleanGiftText(req.body.animal, 80);
-  const destinatario = cleanGiftText(req.body.destinatario, 90);
-  const turma = cleanGiftText(req.body.turma, 40);
-  const mensagem = cleanGiftText(req.body.mensagem, 240);
+  const animal = cleanRequestText(req.body.animal, 80);
+  const destinatario = cleanRequestText(req.body.destinatario, 90);
+  const turma = cleanRequestText(req.body.turma, 40);
+  const mensagem = cleanRequestText(req.body.mensagem, 240);
   const surpresa = req.body.surpresa === true || req.body.surpresa === "on" || req.body.surpresa === "true";
 
   if (!animal || !destinatario || !turma) {
@@ -133,6 +133,39 @@ publicRoutes.post("/gifts", requireUser, async (req, res) => {
     userId: req.user?.id,
     rota: "gift",
     detalhes: { animal, turma, surpresa },
+  });
+
+  res.status(201).json({ ok: true });
+});
+
+publicRoutes.post("/normal-orders", requireUser, async (req, res) => {
+  const db = await getDb();
+  const visitorId = visitorIdFromRequest(req);
+  const animal = cleanRequestText(req.body.animal, 80);
+  const turma = cleanRequestText(req.body.turma, 40);
+  const observacao = cleanRequestText(req.body.observacao, 240);
+  const quantidade = Math.max(1, Math.min(20, Number(req.body.quantidade) || 1));
+
+  if (!animal || !turma) {
+    res.status(400).json({ error: "Preencha animal e turma." });
+    return;
+  }
+
+  await db
+    .prepare(
+      `
+      INSERT INTO pedidos_normais (animal, quantidade, turma, observacao, usuario_id, visitor_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+      `,
+    )
+    .run(animal, quantidade, turma, observacao || null, req.user?.id || null, visitorId || null);
+
+  await trackEvent(db, {
+    tipo: "normal_order_request",
+    visitorId,
+    userId: req.user?.id,
+    rota: "store",
+    detalhes: { animal, quantidade, turma },
   });
 
   res.status(201).json({ ok: true });
@@ -250,7 +283,7 @@ async function topList(db, seasonId, orderField, valueName) {
     }));
 }
 
-function cleanGiftText(value, maxLength) {
+function cleanRequestText(value, maxLength) {
   return String(value || "")
     .replace(/\s+/g, " ")
     .trim()

@@ -179,6 +179,31 @@
           <span class="rarity gold">Gold</span>
           <span class="rarity bicolor">Bicolor</span>
         </div>
+        <section class="normal-order-section reveal-on-scroll">
+          <article class="panel normal-order-card">
+            <div>
+              <p class="eyebrow">Versão normal</p>
+              <h3>Comprar MiniFlex da coleção</h3>
+              <p>
+                Escolha o animal da temporada e solicite a versão normal do produto para combinar a
+                entrega dentro da escola.
+              </p>
+            </div>
+            <span class="normal-order-price">R$5</span>
+          </article>
+
+          <form class="panel normal-order-form form-stack" id="normalOrderForm">
+            <h3>Solicitar compra</h3>
+            <label>Animal escolhido <select id="normalOrderAnimalSelect" name="animal" required></select></label>
+            <label>Quantidade <input name="quantidade" type="number" min="1" max="20" value="1" required /></label>
+            <label>Turma <input name="turma" autocomplete="off" required /></label>
+            <label>Observação (opcional) <textarea name="observacao" rows="3" maxlength="240"></textarea></label>
+            <div class="normal-login-note hidden" id="normalOrderLoginNote">
+              Entre com sua conta para solicitar a compra.
+            </div>
+            <button class="button primary normal-order-submit" type="submit">📦 Solicitar Compra</button>
+          </form>
+        </section>
       </section>
 
       <section class="view gift-page" id="view-gift">
@@ -327,6 +352,14 @@
               <button class="button ghost" data-export="presentes" type="button">Exportar CSV</button>
             </div>
             <div class="gift-admin-list" id="giftRequestList"></div>
+          </section>
+
+          <section class="panel normal-order-admin-panel">
+            <div class="panel-heading">
+              <h3>Pedidos da versão normal</h3>
+              <button class="button ghost" data-export="pedidos_normais" type="button">Exportar CSV</button>
+            </div>
+            <div class="normal-order-admin-list" id="normalOrderList"></div>
           </section>
 
           <div class="chart-grid">

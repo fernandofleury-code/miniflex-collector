@@ -1124,6 +1124,70 @@ th {
   background: linear-gradient(90deg, var(--blue-600) 0 50%, #ec5aa6 50% 100%);
 }
 
+.normal-order-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.normal-order-card,
+.normal-order-form,
+.normal-order-admin-panel {
+  border-color: #cfe0f4;
+  box-shadow: 0 16px 40px rgba(13, 54, 101, 0.09);
+}
+
+.normal-order-card {
+  display: grid;
+  align-content: space-between;
+  min-height: 300px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(232, 242, 255, 0.96), rgba(255, 255, 255, 0.98) 46%),
+    var(--paper);
+}
+
+.normal-order-card p:not(.eyebrow) {
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.normal-order-price {
+  display: inline-grid;
+  width: 84px;
+  height: 84px;
+  margin-top: 26px;
+  place-items: center;
+  color: var(--blue-950);
+  background: var(--gold-400);
+  border: 1px solid #d9a916;
+  border-radius: 50%;
+  box-shadow: 0 16px 32px rgba(200, 146, 19, 0.22);
+  font-size: 1.65rem;
+  font-weight: 950;
+}
+
+.normal-order-form {
+  background:
+    linear-gradient(135deg, rgba(232, 242, 255, 0.7), rgba(255, 255, 255, 0.98) 36%),
+    var(--paper);
+}
+
+.normal-login-note {
+  padding: 11px 12px;
+  color: var(--blue-800);
+  background: #f8fbff;
+  border: 1px solid #cfe0f4;
+  border-radius: 8px;
+  font-weight: 820;
+}
+
+.normal-order-submit:hover {
+  transform: translateY(-1px) scale(1.01);
+}
+
 .gift-nav {
   color: #b91c45;
 }
@@ -1508,14 +1572,38 @@ th {
   border-radius: 8px;
 }
 
+.normal-order-admin-list {
+  display: grid;
+  gap: 10px;
+}
+
+.normal-order-admin-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f8fbff, #ffffff);
+  border: 1px solid #cfe0f4;
+  border-radius: 8px;
+}
+
 .gift-admin-item strong {
   display: block;
   color: var(--blue-950);
   margin-bottom: 3px;
 }
 
+.normal-order-admin-item strong {
+  display: block;
+  color: var(--blue-950);
+  margin-bottom: 3px;
+}
+
 .gift-admin-item p,
-.gift-admin-item small {
+.gift-admin-item small,
+.normal-order-admin-item p,
+.normal-order-admin-item small {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
@@ -1734,7 +1822,8 @@ th {
 
   .gift-hero,
   .gift-layout,
-  .gift-request-grid {
+  .gift-request-grid,
+  .normal-order-section {
     grid-template-columns: 1fr;
   }
 
@@ -1830,6 +1919,10 @@ th {
   }
 
   .gift-admin-item {
+    grid-template-columns: 1fr;
+  }
+
+  .normal-order-admin-item {
     grid-template-columns: 1fr;
   }
 

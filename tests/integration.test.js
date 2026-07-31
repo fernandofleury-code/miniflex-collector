@@ -36,6 +36,17 @@ test("collector registration, dashboard and admin overview work", async () => {
     });
     assert.equal(blockedGift.status, 401);
 
+    const blockedNormalOrder = await fetch(`${baseUrl}/api/public/normal-orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        animal: "001 Tubarão",
+        quantidade: 1,
+        turma: "6A",
+      }),
+    });
+    assert.equal(blockedNormalOrder.status, 401);
+
     const register = await jsonFetch(`${baseUrl}/api/auth/register`, {
       method: "POST",
       visitorId,
@@ -69,6 +80,19 @@ test("collector registration, dashboard and admin overview work", async () => {
       },
     });
     assert.equal(giftRequest.data.ok, true);
+
+    const normalOrder = await jsonFetch(`${baseUrl}/api/public/normal-orders`, {
+      method: "POST",
+      visitorId,
+      cookie: register.cookie,
+      body: {
+        animal: "006 Koala",
+        quantidade: 2,
+        turma: "6A",
+        observacao: "Comprar versão normal",
+      },
+    });
+    assert.equal(normalOrder.data.ok, true);
 
     const emptyRanking = await jsonFetch(`${baseUrl}/api/public/ranking`);
     assert.equal(emptyRanking.data.ranking.length, 0);
@@ -110,6 +134,9 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(overview.data.traffic.summary.logins, 1);
     assert.equal(overview.data.giftRequests.length, 1);
     assert.equal(overview.data.giftRequests[0].destinatario, "Colega Teste");
+    assert.equal(overview.data.normalOrders.length, 1);
+    assert.equal(overview.data.normalOrders[0].animal, "006 Koala");
+    assert.equal(overview.data.normalOrders[0].quantidade, 2);
 
     await jsonFetch(`${baseUrl}/api/admin/gifts/${overview.data.giftRequests[0].id}`, {
       method: "DELETE",
@@ -119,6 +146,15 @@ test("collector registration, dashboard and admin overview work", async () => {
       cookie: adminLogin.cookie,
     });
     assert.equal(overviewAfterGiftDelete.data.giftRequests.length, 0);
+
+    await jsonFetch(`${baseUrl}/api/admin/normal-orders/${overview.data.normalOrders[0].id}`, {
+      method: "DELETE",
+      cookie: adminLogin.cookie,
+    });
+    const overviewAfterNormalOrderDelete = await jsonFetch(`${baseUrl}/api/admin/overview`, {
+      cookie: adminLogin.cookie,
+    });
+    assert.equal(overviewAfterNormalOrderDelete.data.normalOrders.length, 0);
 
     const adminDeviceId = "admin-device-test";
     await jsonFetch(`${baseUrl}/api/public/track`, {
