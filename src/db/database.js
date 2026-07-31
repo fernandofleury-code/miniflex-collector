@@ -17,7 +17,7 @@ export const DEFAULT_ANIMALS = [
   ["003", "Lontra"],
   ["004", "Polvo"],
   ["005", "Raposa"],
-  ["006", "Crocodilo"],
+  ["006", "Koala"],
   ["007", "Caranguejo"],
   ["008", "Elefante"],
   ["009", "Capivara"],
@@ -257,6 +257,7 @@ async function migrate(db) {
   `);
 
   await addColumnIfMissing(db, "usuarios", "ignorar_fluxo", "ignorar_fluxo INTEGER NOT NULL DEFAULT 0");
+  await renameLegacyAnimals(db);
 }
 
 async function addColumnIfMissing(db, table, column, definition) {
@@ -264,6 +265,12 @@ async function addColumnIfMissing(db, table, column, definition) {
   if (!columns.some((item) => item.name === column)) {
     await db.exec(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
   }
+}
+
+async function renameLegacyAnimals(db) {
+  await db
+    .prepare("UPDATE animais SET nome = ? WHERE numero = ? AND nome = ?")
+    .run("Koala", "006", "Crocodilo");
 }
 
 async function seed(db) {

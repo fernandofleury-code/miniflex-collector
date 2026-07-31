@@ -25,7 +25,7 @@ const animalIcons = {
   lontra: "🦦",
   polvo: "🐙",
   raposa: "🦊",
-  crocodilo: "🐊",
+  koala: "🐨",
   caranguejo: "🦀",
   elefante: "🐘",
   capivara: "🟤",
@@ -55,8 +55,8 @@ const animalFacts = {
     "Os polvos têm cerca de 500 milhões de neurônios, permitindo que cada tentáculo aja com bastante independência; quando perdem um tentáculo, conseguem regenerá-lo.",
   raposa:
     "As raposas são da mesma família dos lobos e cachorros, têm audição super sensível e usam a cauda para equilíbrio e aquecimento do corpo.",
-  crocodilo:
-    "Os crocodilos têm a mordida mais forte do mundo animal; além disso, seus dentes são renovados ao longo da vida.",
+  koala:
+    "Os coalas vivem principalmente em árvores de eucalipto e dormem muitas horas por dia para economizar energia.",
   caranguejo:
     "Os caranguejos possuem 10 patas, conseguem regenerar membros perdidos e têm visão periférica, deixando só os olhos para fora quando se enterram.",
   elefante:
@@ -134,6 +134,13 @@ function bindGift() {
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    if (!state.user) {
+      toast("Entre com sua conta para solicitar um presente.", true);
+      showView("dashboard");
+      return;
+    }
+
     const payload = formJson(form);
     payload.surpresa = form.querySelector("[name='surpresa']").checked;
 
@@ -316,6 +323,14 @@ function bindAdmin() {
     await downloadCsv(exportButton.dataset.export);
   });
 
+  document.addEventListener("click", async (event) => {
+    const deleteGiftButton = event.target.closest("[data-delete-gift]");
+    if (!deleteGiftButton) return;
+    event.preventDefault();
+    if (!window.confirm("Excluir este pedido de presente?")) return;
+    await adminAction(`/api/admin/gifts/${deleteGiftButton.dataset.deleteGift}`, {}, "Pedido excluído.", "DELETE");
+  });
+
   $("#importCatalogsButton").addEventListener("click", async (event) => {
     event.preventDefault();
     await adminAction(
@@ -450,6 +465,7 @@ function renderSessionState() {
   $$(".nav-logout").forEach((button) => {
     button.classList.toggle("hidden", !state.user && !state.admin);
   });
+  renderGiftLoginState();
 
   if (state.user && !state.refreshTimer) {
     state.refreshTimer = window.setInterval(refreshCollectorData, AUTO_REFRESH_MS);
@@ -459,6 +475,15 @@ function renderSessionState() {
     window.clearInterval(state.refreshTimer);
     state.refreshTimer = null;
   }
+}
+
+function renderGiftLoginState() {
+  const note = $("#giftLoginNote");
+  const submit = $("#giftForm .gift-submit");
+  if (!note || !submit) return;
+
+  note.classList.toggle("hidden", Boolean(state.user));
+  submit.textContent = state.user ? "❤️ Solicitar Presente" : "Entrar para Solicitar";
 }
 
 async function refreshCollectorData() {
@@ -656,6 +681,14 @@ function renderGiftRequests(requests) {
           <div class="gift-admin-meta">
             <span class="badge">${request.surpresa ? "Surpresa" : "Entrega normal"}</span>
             <small>${formatDateTime(request.data)}</small>
+            <button
+              class="icon-button gift-delete-button"
+              data-delete-gift="${request.id}"
+              aria-label="Excluir pedido de presente"
+              type="button"
+            >
+              ×
+            </button>
           </div>
         </article>
       `,

@@ -1459,6 +1459,15 @@ th {
   color: var(--gift-deep);
 }
 
+.gift-login-note {
+  padding: 11px 12px;
+  color: var(--gift-deep);
+  background: #fff8fa;
+  border: 1px solid var(--gift-line);
+  border-radius: 8px;
+  font-weight: 820;
+}
+
 .gift-submit {
   color: white;
   background: linear-gradient(135deg, var(--gift-deep), var(--gift-red) 72%, var(--gift-pink));
@@ -1516,6 +1525,16 @@ th {
   display: grid;
   justify-items: end;
   gap: 8px;
+}
+
+.gift-delete-button {
+  width: 36px;
+  height: 36px;
+  margin-left: 0;
+  color: var(--danger);
+  background: #fff0ee;
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .admin-space {

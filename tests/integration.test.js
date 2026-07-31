@@ -25,6 +25,17 @@ test("collector registration, dashboard and admin overview work", async () => {
     });
     assert.equal(tracked.data.ok, true);
 
+    const blockedGift = await fetch(`${baseUrl}/api/public/gifts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        animal: "001 Tubarão",
+        destinatario: "Colega Teste",
+        turma: "6A",
+      }),
+    });
+    assert.equal(blockedGift.status, 401);
+
     const register = await jsonFetch(`${baseUrl}/api/auth/register`, {
       method: "POST",
       visitorId,
@@ -34,6 +45,9 @@ test("collector registration, dashboard and admin overview work", async () => {
       },
     });
     assert.equal(register.data.user.nome, "Aluno Teste");
+
+    const collection = await jsonFetch(`${baseUrl}/api/public/collection`);
+    assert.equal(collection.data.animals.find((animal) => animal.numero === "006").nome, "Koala");
 
     const dashboard = await jsonFetch(`${baseUrl}/api/auth/dashboard`, {
       cookie: register.cookie,
@@ -45,6 +59,7 @@ test("collector registration, dashboard and admin overview work", async () => {
     const giftRequest = await jsonFetch(`${baseUrl}/api/public/gifts`, {
       method: "POST",
       visitorId,
+      cookie: register.cookie,
       body: {
         animal: "001 Tubarão",
         destinatario: "Colega Teste",
@@ -95,6 +110,15 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(overview.data.traffic.summary.logins, 1);
     assert.equal(overview.data.giftRequests.length, 1);
     assert.equal(overview.data.giftRequests[0].destinatario, "Colega Teste");
+
+    await jsonFetch(`${baseUrl}/api/admin/gifts/${overview.data.giftRequests[0].id}`, {
+      method: "DELETE",
+      cookie: adminLogin.cookie,
+    });
+    const overviewAfterGiftDelete = await jsonFetch(`${baseUrl}/api/admin/overview`, {
+      cookie: adminLogin.cookie,
+    });
+    assert.equal(overviewAfterGiftDelete.data.giftRequests.length, 0);
 
     const adminDeviceId = "admin-device-test";
     await jsonFetch(`${baseUrl}/api/public/track`, {

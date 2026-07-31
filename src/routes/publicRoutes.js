@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getDb } from "../db/database.js";
+import { requireUser } from "../middleware/auth.js";
 import { getActiveSeason } from "../services/collectionService.js";
 import { trackEvent, visitorIdFromRequest } from "../services/analyticsService.js";
 
@@ -103,7 +104,7 @@ publicRoutes.post("/track", async (req, res) => {
   res.json({ ok: true });
 });
 
-publicRoutes.post("/gifts", async (req, res) => {
+publicRoutes.post("/gifts", requireUser, async (req, res) => {
   const db = await getDb();
   const visitorId = visitorIdFromRequest(req);
   const animal = cleanGiftText(req.body.animal, 80);

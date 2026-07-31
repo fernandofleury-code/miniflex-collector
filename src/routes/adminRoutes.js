@@ -156,6 +156,19 @@ adminRoutes.post("/ignore-current-visitor", async (req, res) => {
   res.json({ ok: true });
 });
 
+adminRoutes.delete("/gifts/:id", async (req, res) => {
+  const db = await getDb();
+  const giftId = Number(req.params.id);
+  const result = await db.prepare("DELETE FROM presentes WHERE id = ?").run(giftId);
+
+  if (!result.changes) {
+    res.status(404).json({ error: "Pedido de presente não encontrado." });
+    return;
+  }
+
+  res.json({ ok: true });
+});
+
 adminRoutes.post("/catalogs", async (req, res) => {
   const db = await getDb();
   const activeSeason = await getActiveSeason(db);
