@@ -273,6 +273,7 @@ async function migrate(db) {
 
   await addColumnIfMissing(db, "usuarios", "ignorar_fluxo", "ignorar_fluxo INTEGER NOT NULL DEFAULT 0");
   await renameLegacyAnimals(db);
+  await normalizeNormalOrderAnimals(db);
 }
 
 async function addColumnIfMissing(db, table, column, definition) {
@@ -286,6 +287,12 @@ async function renameLegacyAnimals(db) {
   await db
     .prepare("UPDATE animais SET nome = ? WHERE numero = ? AND nome = ?")
     .run("Koala", "006", "Crocodilo");
+}
+
+async function normalizeNormalOrderAnimals(db) {
+  await db
+    .prepare("UPDATE pedidos_normais SET animal = ? WHERE animal <> ?")
+    .run("Animal aleatório", "Animal aleatório");
 }
 
 async function seed(db) {

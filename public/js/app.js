@@ -594,20 +594,18 @@ async function loadCollection() {
 }
 
 function renderGiftAnimalOptions(animals = state.giftAnimals) {
-  ["#giftAnimalSelect", "#normalOrderAnimalSelect"].forEach((selector) => {
-    const select = $(selector);
-    if (!select) return;
+  const select = $("#giftAnimalSelect");
+  if (!select) return;
 
-    const currentValue = select.value;
-    select.innerHTML = [
-      '<option value="">Escolha um animal</option>',
-      ...animals.map((animal) => {
-        const label = `${animal.numero} ${animal.nome}`;
-        return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
-      }),
-    ].join("");
-    if (currentValue) select.value = currentValue;
-  });
+  const currentValue = select.value;
+  select.innerHTML = [
+    '<option value="">Escolha um animal</option>',
+    ...animals.map((animal) => {
+      const label = `${animal.numero} ${animal.nome}`;
+      return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
+    }),
+  ].join("");
+  if (currentValue) select.value = currentValue;
 }
 
 function renderCollectionProgress({ owned, total, progress, hasProgress }) {

@@ -141,13 +141,13 @@ publicRoutes.post("/gifts", requireUser, async (req, res) => {
 publicRoutes.post("/normal-orders", requireUser, async (req, res) => {
   const db = await getDb();
   const visitorId = visitorIdFromRequest(req);
-  const animal = cleanRequestText(req.body.animal, 80);
+  const animal = "Animal aleatório";
   const turma = cleanRequestText(req.body.turma, 40);
   const observacao = cleanRequestText(req.body.observacao, 240);
   const quantidade = Math.max(1, Math.min(20, Number(req.body.quantidade) || 1));
 
-  if (!animal || !turma) {
-    res.status(400).json({ error: "Preencha animal e turma." });
+  if (!turma) {
+    res.status(400).json({ error: "Preencha a turma." });
     return;
   }
 
