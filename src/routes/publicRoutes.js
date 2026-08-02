@@ -141,24 +141,23 @@ publicRoutes.post("/gifts", requireUser, async (req, res) => {
 publicRoutes.post("/normal-orders", requireUser, async (req, res) => {
   const db = await getDb();
   const visitorId = visitorIdFromRequest(req);
-  const animal = "Animal aleatório";
+  const animal = cleanRequestText(req.body.animal, 80);
   const turma = cleanRequestText(req.body.turma, 40);
-  const observacao = cleanRequestText(req.body.observacao, 240);
   const quantidade = Math.max(1, Math.min(20, Number(req.body.quantidade) || 1));
 
-  if (!turma) {
-    res.status(400).json({ error: "Preencha a turma." });
+  if (!animal || !turma) {
+    res.status(400).json({ error: "Preencha animal e turma." });
     return;
   }
 
   await db
     .prepare(
       `
-      INSERT INTO pedidos_normais (animal, quantidade, turma, observacao, usuario_id, visitor_id)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO pedidos_normais (animal, quantidade, turma, usuario_id, visitor_id)
+      VALUES (?, ?, ?, ?, ?)
       `,
     )
-    .run(animal, quantidade, turma, observacao || null, req.user?.id || null, visitorId || null);
+    .run(animal, quantidade, turma, req.user?.id || null, visitorId || null);
 
   await trackEvent(db, {
     tipo: "normal_order_request",

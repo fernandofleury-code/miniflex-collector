@@ -106,7 +106,6 @@ adminRoutes.get("/overview", async (req, res) => {
         p.animal,
         p.quantidade,
         p.turma,
-        p.observacao,
         p.status,
         p.data,
         u.nome AS solicitante
@@ -442,7 +441,7 @@ adminRoutes.get("/export/:entity", async (req, res) => {
     compras: "SELECT id, usuario_id, quantidade_pacotes, data FROM compras ORDER BY id",
     eventos_site: "SELECT id, tipo, visitor_id, usuario_id, rota, detalhes, data FROM eventos_site ORDER BY id",
     presentes: "SELECT id, animal, destinatario, turma, mensagem, surpresa, usuario_id, visitor_id, status, data FROM presentes ORDER BY id",
-    pedidos_normais: "SELECT id, animal, quantidade, turma, observacao, usuario_id, visitor_id, status, data FROM pedidos_normais ORDER BY id",
+    pedidos_normais: "SELECT id, animal, quantidade, turma, usuario_id, visitor_id, status, data FROM pedidos_normais ORDER BY id",
   };
 
   if (!allowed[entity]) {

@@ -40,6 +40,7 @@ test("collector registration, dashboard and admin overview work", async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        animal: "001 Tubarão",
         quantidade: 1,
         turma: "6A",
       }),
@@ -85,9 +86,9 @@ test("collector registration, dashboard and admin overview work", async () => {
       visitorId,
       cookie: register.cookie,
       body: {
+        animal: "006 Koala",
         quantidade: 2,
         turma: "6A",
-        observacao: "Comprar versão normal",
       },
     });
     assert.equal(normalOrder.data.ok, true);
@@ -133,7 +134,7 @@ test("collector registration, dashboard and admin overview work", async () => {
     assert.equal(overview.data.giftRequests.length, 1);
     assert.equal(overview.data.giftRequests[0].destinatario, "Colega Teste");
     assert.equal(overview.data.normalOrders.length, 1);
-    assert.equal(overview.data.normalOrders[0].animal, "Animal aleatório");
+    assert.equal(overview.data.normalOrders[0].animal, "006 Koala");
     assert.equal(overview.data.normalOrders[0].quantidade, 2);
 
     await jsonFetch(`${baseUrl}/api/admin/gifts/${overview.data.giftRequests[0].id}`, {

@@ -185,8 +185,8 @@
               <p class="eyebrow">Versão normal</p>
               <h3>Comprar MiniFlex da coleção</h3>
               <p>
-                A versão normal é entregue com animal aleatório da temporada. Você solicita a
-                quantidade e combina a entrega dentro da escola.
+                Escolha o animal da temporada e solicite a versão normal do produto para combinar a
+                entrega dentro da escola.
               </p>
             </div>
             <span class="normal-order-price">R$5</span>
@@ -194,14 +194,9 @@
 
           <form class="panel normal-order-form form-stack" id="normalOrderForm">
             <h3>Solicitar compra</h3>
-            <div class="normal-random-note">
-              <span>🎲</span>
-              <strong>Animal aleatório</strong>
-              <p>Não é possível escolher o animal nesta compra.</p>
-            </div>
+            <label>Animal escolhido <select id="normalOrderAnimalSelect" name="animal" required></select></label>
             <label>Quantidade <input name="quantidade" type="number" min="1" max="20" value="1" required /></label>
             <label>Turma <input name="turma" autocomplete="off" required /></label>
-            <label>Observação (opcional) <textarea name="observacao" rows="3" maxlength="240"></textarea></label>
             <div class="normal-login-note hidden" id="normalOrderLoginNote">
               Entre com sua conta para solicitar a compra.
             </div>

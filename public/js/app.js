@@ -594,18 +594,20 @@ async function loadCollection() {
 }
 
 function renderGiftAnimalOptions(animals = state.giftAnimals) {
-  const select = $("#giftAnimalSelect");
-  if (!select) return;
+  ["#giftAnimalSelect", "#normalOrderAnimalSelect"].forEach((selector) => {
+    const select = $(selector);
+    if (!select) return;
 
-  const currentValue = select.value;
-  select.innerHTML = [
-    '<option value="">Escolha um animal</option>',
-    ...animals.map((animal) => {
-      const label = `${animal.numero} ${animal.nome}`;
-      return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
-    }),
-  ].join("");
-  if (currentValue) select.value = currentValue;
+    const currentValue = select.value;
+    select.innerHTML = [
+      '<option value="">Escolha um animal</option>',
+      ...animals.map((animal) => {
+        const label = `${animal.numero} ${animal.nome}`;
+        return `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`;
+      }),
+    ].join("");
+    if (currentValue) select.value = currentValue;
+  });
 }
 
 function renderCollectionProgress({ owned, total, progress, hasProgress }) {
@@ -767,7 +769,6 @@ function renderNormalOrders(orders) {
           <div>
             <strong>${escapeHtml(order.solicitante || "Colecionador")}</strong>
             <p>${escapeHtml(order.animal)} • ${order.quantidade} unidade(s) • ${escapeHtml(order.turma)}</p>
-            ${order.observacao ? `<small>${escapeHtml(order.observacao)}</small>` : ""}
           </div>
           <div class="gift-admin-meta">
             <span class="badge">Normal</span>

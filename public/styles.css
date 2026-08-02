@@ -1175,41 +1175,6 @@ th {
     var(--paper);
 }
 
-.normal-random-note {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  column-gap: 10px;
-  row-gap: 2px;
-  align-items: center;
-  padding: 12px;
-  color: var(--blue-950);
-  background: #f8fbff;
-  border: 1px solid #cfe0f4;
-  border-radius: 8px;
-}
-
-.normal-random-note span {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  grid-row: span 2;
-  place-items: center;
-  background: var(--gold-100);
-  border: 1px solid #f3d77c;
-  border-radius: 8px;
-}
-
-.normal-random-note strong {
-  display: block;
-}
-
-.normal-random-note p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.35;
-}
-
 .normal-login-note {
   padding: 11px 12px;
   color: var(--blue-800);
