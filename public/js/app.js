@@ -38,6 +38,7 @@ const animalImages = {
   lontra: "/assets/animals/lontra.webp",
   polvo: "/assets/animals/polvo.webp",
   raposa: "/assets/animals/raposa.webp",
+  koala: "/assets/animals/koala.png",
   caranguejo: "/assets/animals/caranguejo.webp",
   elefante: "/assets/animals/elefante.webp",
   capivara: "/assets/animals/capivara.webp",
